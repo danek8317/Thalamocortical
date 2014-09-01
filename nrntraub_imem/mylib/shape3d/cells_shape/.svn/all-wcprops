@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/62/nrntraub/mylib/shape3d/cells_shape
+END
+interneuron_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/62/nrntraub/mylib/shape3d/cells_shape/interneuron_shape.dat
+END
+nontuftpyr_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/61/nrntraub/mylib/shape3d/cells_shape/nontuftpyr_shape.dat
+END
+tcr_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/61/nrntraub/mylib/shape3d/cells_shape/tcr_shape.dat
+END
+tuftpyr_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/62/nrntraub/mylib/shape3d/cells_shape/tuftpyr_shape.dat
+END
+spiny_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/61/nrntraub/mylib/shape3d/cells_shape/spiny_shape.dat
+END
+suppyr_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/61/nrntraub/mylib/shape3d/cells_shape/suppyr_shape.dat
+END
+nrt_shape.dat
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/Thalamocortical_loop_based_on_Traub/!svn/ver/62/nrntraub/mylib/shape3d/cells_shape/nrt_shape.dat
+END

@@ -1,0 +1,153 @@
+//usunelam wejscie z nrt
+strdef dir
+objref Num_pop
+
+dir = "/path/to/my/dir/"
+sample = 0  //change the random numbers?
+cells_type = 14
+{Num_pop = new Vector()
+Num_pop.append(1000,50,90,90,90,240,800,200,500,100,100,100,100,100)}
+if (one_tenth_ncell) {
+	Num_pop.div(10)
+}
+
+n_cell = Num_pop.sum()
+objref Map_names[cells_type]
+{
+Map_names[0] = new String("suppyrRS")
+Map_names[1] = new String("suppyrFRB")
+Map_names[2] = new String("supbask")
+Map_names[3] = new String("supaxax")
+Map_names[4] = new String("supLTS")
+Map_names[5] = new String("spinstell")
+Map_names[6] = new String("tuftIB")
+Map_names[7] = new String("tuftRS")
+Map_names[8] = new String("nontuftRS")
+Map_names[9] = new String("deepbask")
+Map_names[10] = new String("deepaxax")
+Map_names[11] = new String("deepLTS")
+Map_names[12] = new String("TCR")
+Map_names[13] = new String("nRT")
+}
+
+
+
+///////////////////////////////////////////////////////////// params for saving_data.hoc
+
+strdef  add_curr_params_path
+
+shape3d = 0
+
+save_currents = 1
+add_curr_params_path = "saving_data/additional_curr.dat"
+n_currents = 12
+n_not_ionic_curr = 8
+geometry = 0
+point_current_position = 0
+select_pop = 0
+save_suppyrRS = 0
+save_suppyrFRB = 0
+save_supbask = 0
+save_supaxax = 0
+save_supLTS = 0
+save_spinstell = 0
+save_tuftIB = 0
+save_tuftRS = 0
+save_nontuftRS = 0
+save_deepbask = 0
+save_deepaxax = 0
+save_deepLTS = 0
+save_TCR = 0
+ave_nRT = 0
+next_ = 15
+t_step = 0.1
+tstart = 0
+
+if (shape3d ){
+	tstop = 0
+	save_currents = 0
+	geometry = 1
+	point_current_position = 1
+	}
+/////////////////////////////////////////////////////////////// end params for saving_data.hoc
+
+
+
+////////////////////////////////////////////////////////////// params for stimulus.hoc and vecevent.hoc
+
+strdef  spikes_dir
+spikes_dir = "/path/to/input/spikes/dir/"
+
+
+scale_TCR_output = 0
+use_vecstim = 0
+use_input_curr = 1
+active_ions = 0
+passive_axon = 0
+passive_soma = 0
+passive_dendrites = 0
+set_zero_fast_na =0
+
+input_electrode = 0
+xelectrode =  1 
+yelectrode =  -1700 
+zelectrode = 1 
+electrode_range = 50 
+turn_on_suppyrRS = 1
+turn_on_suppyrFRB = 1
+turn_on_supbask = 1
+turn_on_supaxax = 1
+turn_on_supLTS = 1
+turn_on_spinstell = 1
+turn_on_tuftIB = 1
+turn_on_tuftRS = 1
+turn_on_deepbask = 1
+turn_on_deepaxax = 1
+turn_on_deepLTS = 1
+turn_on_nontuftRS = 1
+
+////////////////////////////////////////////////////////////// end params for stimulus.hoc and vecevent.hoc
+
+
+
+///////////////////////////////////////////////////////////// params for coor.hoc
+
+
+strdef pops_position_file, realistic_random_dens
+pops_position_file= "shape3d/pops_position.dat"
+realistic_random_dens = "norm_dens.txt"
+
+objref   spread_cell, depth_cell, position_style
+
+spread_cell = new Vector()
+depth_cell = new Vector()
+position_style = new String()
+position_style.s ="realistic"//"traub", "realistic", "myposition"
+
+powtorzenia = 1
+column_width = 400
+//top = 300 //where is the top of the highest layer - not used
+
+//space_between_cells = 10 // microns
+
+objref ve
+
+{ve = new Vector(37,0)
+ve.indgen(-1850,-50,50)}
+
+
+
+//////////////////////////////////////////////////////////////////
+
+
+/*
+"/sum_i/sum_i"
+"/i/iout"
+"/v/oout"
+"/isyn/nodessyn"
+"/isyn/outisyn"
+*/
+
+
+
+

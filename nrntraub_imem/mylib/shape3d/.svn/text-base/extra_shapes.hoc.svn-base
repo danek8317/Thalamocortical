@@ -1,0 +1,64 @@
+
+objref shapes_map,shapes_map_file
+strdef tmp_str
+double scan[13]
+
+
+shapes_map_file = new File("shapes_map.txt")
+shapes_map = new List()
+
+act = 0
+shapes_map_file.ropen()
+
+while (! shapes_map_file.eof()){
+    shapes_map.append(new String())
+    shapes_map_file.scanstr(shapes_map.o(act).s)
+    act = act +1
+    }
+
+shapes_map_file.close()
+
+proc basic_shape(){localobj shape_file,s
+
+    s = new String()
+    sprint(s.s, "mylib/shape3d/cells_shape/%s_shape.dat", shapes_map.o($o1.type).s)
+    shape_file = new File(s.s)
+    shape_file.ropen()
+
+
+    while (! shape_file.eof()){
+         for i = 0,12{
+                shape_file.scanstr(tmp_str)
+                sscanf(tmp_str, "%lf", &scan[i])
+                //scan[i] = shape_file.scanstr()
+                }
+          if ((0) ) {
+
+        print shapes_map.o($o1.type).s,scan[0], scan[1], scan[2],scan[3],scan[4],scan[5],scan[6],scan[7],scan[8],scan[9],scan[10],scan[11],scan[12], pc.id}
+
+        $o1.comp[ scan[0] ] {pt3dclear() pt3dadd( scan[1], scan[2],scan[3],scan[4] ) pt3dadd( scan[5],scan[6],scan[7],scan[8]) pt3dadd(scan[9],scan[10],scan[11],scan[12])}
+
+        }
+shape_file.close()
+    }
+
+
+
+
+proc position_3d(){
+   forsec $o1.all{
+        for i = 0, n3d()-1 {pt3dchange(i, $2-$o1.x+x3d(i), \
+      			$3-$o1.y+y3d(i), $4-$o1.z+z3d(i),diam3d(i))
+        		}
+
+            }
+
+        $o1.x = $2
+        $o1.y = $3
+        $o1.z = $4
+}
+
+
+
+
+

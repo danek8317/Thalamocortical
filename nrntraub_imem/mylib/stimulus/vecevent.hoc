@@ -1,0 +1,113 @@
+objref  vec_temp, vec_temp_diff
+cell_pop = 3560
+objref  vs_VecStim[cell_pop]
+objref evec[cell_pop]
+objref file_event, spike_t, spike_cell
+
+
+if (one_tenth_ncell) cell_pop = cell_pop * 0.1
+
+
+proc vecstim_init(){
+if (use_vecstim){
+	open_file_to_read(spikes_dir,"out.dat",file_event) 
+	spike_t = new Vector()
+	spike_cell = new Vector()
+	spike_t.scanf(file_event, 1, 2)
+        file_event.close()
+
+	open_file_to_read(spikes_dir,"out.dat",file_event) 
+	spike_cell.scanf(file_event, 2, 2)
+	file_event.close()
+
+	vec_size_ = spike_t.size()
+
+	for i = 0,n_cell - 1{
+		evec[i] = new Vector()
+		}
+
+	for i =0,vec_size_-1{
+		evec[spike_cell.x[i]].append(spike_t.x[i] ) 
+       		}
+	set_vecstim()
+ 	}
+}
+
+
+proc set_vecstim() {local i, gid  localobj c, vstim
+	if (!use_vecstim) { return }
+	for i = 0,cell_pop-1  {
+  
+		vs_VecStim[i] = new VecStim(.5)  
+		vs_VecStim[i].play(evec[i])
+		//evec[gid].printf()
+
+		}
+}
+
+func nc_append() {local targid, temp, comp  localobj cell, syn, s,fi, st,nc
+	st = new String()
+	//comp = -1
+	//fi = new File()
+	//fi.aopen("connect.out")
+
+	targid = target_exists($2)
+	if ($5 <= 0) {
+//		if (targid >= 0) {
+//			print pc.id, $1, $2, targid, $3, $4, $5, " ", pc.gid2obj(targid)
+//		}
+		if (icdel0_ == 0) if ((pc.gid_exists($1)!=0) != (targid != 0)) {
+if (pmesg) print "Notice: Requesting an interprocessor connection delay of 0"
+			icdel0_ = 1
+		}
+		if (cdel0_ == 0) {
+if (pmesg) print "Notice: Requesting a connection delay of 0. Setting those to 1ms."
+			cdel0_ = 1
+		}
+		$5 = 1
+	}
+	if ($5 < mindelay_) if (pc.gid_exists($1) == 0) if (targid >= 0) {
+		mindelay_ = $5
+	}
+
+	if (targid >= 0) {
+		cell = pc.gid2cell(targid)
+		syn = cell.synlist.object($3)
+        sscanf(secname(), "%*[^0-9]%*d%*[^0-9]%d",&comp)
+		s = new String()
+		classname(syn, s.s)
+		if (strcmp(s.s, "GABAA") == 0) {
+			syn.e = vgaba.x[cell.type]
+		}
+
+		// for debugging :need to switch the debug lines in
+		// ampa.mod, traub_nmda.mod, and gabaa.mod
+	    if (0) {
+		syn.get_loc
+		
+		pop_section()
+		syn.srcgid = $1
+		syn.targid = $2
+		syn.synid = $3
+		syn.comp = comp
+	    }
+	}
+	if (targid >= 0) {
+		//nc.record("print t")
+		if (use_vecstim){
+
+			cell.comp[comp] nc = new NetCon(vs_VecStim[$1],cell.synlist.object($3),0,$5,$4)
+			return netstims.append(nc)
+
+		}else{
+		return  pnm.nc_append($1, targid, $3, $4, $5)
+		}
+		//temp =  pnm.nc_append($1, targid, $3, $4, $5)
+
+	return 0
+
+	}else{ 
+		return -1
+	}
+}
+

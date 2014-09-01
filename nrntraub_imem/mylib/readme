@@ -1,0 +1,52 @@
+!!! Important
+
+if you use cvode { e.g in init_all_data() { .. set_env_for_cvode_active() ...}
+you need to set
+
+default_var("spike_compress", 0)
+instead
+default_var("spike_compress", 5)
+
+
+
+
+changes in the oryginal code:
+
+in parlib.hoc
+
+in prun
+
+	while (t < tstop){
+		if (pc.id == 0){print t}        
+		take_currents()
+		order_write_data()	
+		fadvance()
+	}
+
+instead 
+
+
+manage_setup.hoc
+just after {localloadfile("hoc/traubcon.hoc")}:
+manage_setup.hoc:{load_file("mylib/lib.hoc")}
+manage_setup.hoc:{load_file("mylib/params.hoc")}
+
+just before {localloadfile("net/groucho.hoc")}:
+manage_setup.hoc:{localloadfile("mylib/shape3d/coor.hoc")}
+manage_setup.hoc:{load_file("mylib/stimulus/stimulus.hoc")}
+
+and just after {localloadfile("net/groucho.hoc")}:
+manage_setup.hoc:{localloadfile("mylib/init.hoc")}
+
+in init.hoc
+
+
+just befoure running the siumulation
+if (save_currents){init_all_data()}
+
+
+in mod folders additional files:
+izap.mod
+izap2.mod
+vecevent.mod
+

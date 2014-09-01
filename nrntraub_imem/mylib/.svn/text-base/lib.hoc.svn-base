@@ -1,0 +1,53 @@
+proc set_env_for_cvode_active(){
+	cvode_active(1)
+	cvode.atol(1e-1)
+    cvode.use_long_double(1)
+	//cvode.debug_event(0)
+}
+
+
+
+func give_current(){local curr, x localobj mt, pp 
+
+	curr = 0
+	mt = new MechanismType(1)
+	mt.select($s1)
+
+	for (pp = mt.pp_begin(); object_id(pp) != 0; pp = mt.pp_next()) {
+		x =pp.get_loc()
+		curr = curr + pp.i	
+		pop_section()
+		}
+	return curr
+}
+
+proc open_file_to_read(){
+	strdef str
+	$o3 = new File()
+	sprint(str, "%s%s", $s1, $s2)
+	$o3.ropen(str)
+
+}
+
+
+proc open_file_to_write(){
+    strdef str
+    sprint(str, "%s%s%d.dat", $s2, $s1, $3)
+	$o4 = new File()
+	$o4.wopen(str)
+}
+
+
+proc remove_temporary_data(){local i
+	for i = 0, $o1.count()-1{
+		$o1.o(i).remove(0,$2 )
+		}
+}
+
+
+proc interpolation(){
+    for l = 0, $o1.count() -1{
+        $o2.append(new Vector())
+        $o2.o(l).interpolate($o3,$o4,$o1.o(l))
+	    }
+}

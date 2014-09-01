@@ -1,0 +1,223 @@
+obfunc non_ionic_source_i(){local j, x  localobj mt, pp, ret
+
+    ret = new Vector()
+	mt = new MechanismType(1)
+
+    for i = 0, n_not_ionic_curr-1{
+        ret.append((give_current( Not_ionic_currents.o(i).s)* Not_ionic_currents_signs.x(i)))
+        }
+
+	return ret
+}
+
+
+proc take_currents(){ localobj c
+
+    if (!save_currents){return}
+	if (t > tstart){
+		tvec.append(t)                                  //save current time step
+
+	i_all = 0                                           //sum of all currents
+	s = -1                                              //needed in for loop - current segment
+	nr_cell = -1                                        //needed in for loop - current cell
+			
+	for k = 0, cells.count()-1{
+			c = cells.object(k)
+			nr_cell = base_gid(gidvec.x(k))
+            d = c.type()
+			
+			forsec c.all{ 
+				if (save_pop.x[d] == 0){continue}           //check if you want to save data 
+                                                            //from this population
+				
+				for (l = 0; l < nseg ; l=l+1){
+                    tmp = (2*l +1)/(2*nseg)                 //position  of the source
+                                                            //in the compartment in oryginal Traub
+                                                            //always, nseg = 1 so tmp = 0.5
+					s = s+1                                 //current segment
+
+					i_m = ina(tmp) + ik(tmp) + i_cap(tmp)      
+       
+					if (ismembrane("ca_ion")) { i_m = i_m+ ica(tmp)}
+					if (ismembrane("pas")) { i_m = i_m+ i_pas(tmp)}
+					if (ismembrane("ar")) { i_m = i_m+ i_ar(tmp)}
+					if (ismembrane("cat")) { i_m = i_m+ i_cat(tmp)}
+					if (ismembrane("cat_a")) { i_m = i_m+ i_cat_a(tmp)}
+
+					ss = non_ionic_source_i()                 //impact from non ionic current
+                                                             
+
+					i_m = i_m*area(tmp)*1e-2 + ss.sum()       //sum of all this currents
+
+					IM.o(s).append(i_m)
+					V_.o(s).append(v(tmp))
+
+                    a = 0
+                    for i = 0, n_currents -1{
+                        execute(Add_curr_cond[i].s)  
+                        if (cond){  
+                           execute(Add_curr[i].s)
+                           Add_curr_save[i].o(s).append(a) 
+                           }else{
+                           Add_curr_save[i].o(s).append(0)
+                           }                             
+                        }
+                    
+					i_all = i_all + i_m
+					//ss_all = ss_all + ss.sum()
+
+		      			}
+				}
+			sum_I.o(k).append(i_all)
+			i_all = 0
+	
+		}
+
+
+    }
+}
+
+proc order_write_data(){
+	if (t >last + next_){
+		write_data(last , last + next_-0.1)
+		last = last + next_
+		}
+    if (t >= tstop){  write_last_data()}
+}
+
+proc write_last_data(){
+	if (last <tstop){
+		write_data(last,tstop)
+		}
+}
+
+
+proc write_data(){
+	if ( (!save_currents) || (t < tstart)||(t < next_) ) { 
+        return
+		} else{
+
+		//last = t
+		pc.barrier()
+	
+	T = new Vector()	
+
+	T.indgen($1 , $2, t_step)
+		want_all_data()
+		tv_size = tvec.size() - 1
+
+		while ((tv_size>=0) && (tvec.x(tv_size) >= last + next_)){
+			tv_size = tv_size - 1}
+		if (tv_size < 0){return}
+		remove_temporary_data(IM,tv_size )
+
+		remove_temporary_data(V_,tv_size )		
+		for i=0,n_currents-1{
+		    remove_temporary_data(Add_curr_save[i],tv_size )    
+            }
+		remove_temporary_data(sum_I,tv_size )
+
+		tvec.remove(0,tv_size )
+		}
+}
+
+
+
+//I wasn't able to  define it as localobj
+objref yeven[14]
+
+proc want_all_data() {local i localobj c
+
+
+	for i = 0,13{
+    yeven[i] = new List()
+	}
+
+	interpolation(IM, yeven[0], T, tvec)
+	interpolation(V_, yeven[1], T, tvec)
+	interpolation(sum_I, yeven[2], T, tvec)
+
+	for i =0,n_currents-1{
+	interpolation(Add_curr_save[i], yeven[i+3], T, tvec)
+	}
+                      	out.aopen()
+                        outisyn.aopen()
+                        outv.aopen()
+
+   for tt = 0, T.size()-1{	
+	    k = -1
+    	nr_cell = -1	
+	    comp = 0
+
+	    for j = 0, pnm.ncell{
+	    	//pc.barrier()
+	    	if (target_exists(j)<0){
+                }else{
+        		//out.aopen()
+        		//outisyn.aopen()
+        		//outv.aopen()
+    
+        		targid = target_exists(j)
+        		c = pc.gid2cell(targid)
+        		nr_cell =  targid
+        		d = c.type()
+
+
+	    		forsec c.all{ 
+	    			if (save_pop.x[d] == 0){continue}
+	    			sscanf(secname(), "%*[^0-9]%*d%*[^0-9]%d",&comp)
+	    		
+	    			for l = 1, nseg{
+	    				k = k+1	
+	    				out.printf("%f\t%d\t%d\t%d\t%20.10e\n", T.x(tt), nr_cell, comp,  l, yeven[0].o(k).x(tt))
+	    				outv.printf("%f\t%d\t%d\t%d\t%20.10e\n", T.x(tt),  nr_cell, comp,  l, yeven[1].o(k).x(tt))
+	    				outisyn.printf("%f\t%d\t%d\t%d",  T.x(tt),  nr_cell, comp,  l)
+                        for akt_curr = 3, n_currents +2 {
+                            outisyn.printf("\t%20.10e",yeven[akt_curr].o(k).x(tt))
+	    				    }
+                       outisyn.printf("\n")
+			    	    }
+                    }
+
+	   // 	    out.close()	
+    	//	    outv.close()
+	  //  	    outisyn.close()
+			    }
+		
+            }
+
+
+
+    	for i = 0, cells.count()-1{		
+	    	sum_i_all.printf("%f\t%d\t%20.10e\n",  T.x(tt),base_gid(gidvec.x(i)), yeven[2].o(i).x(tt))
+	    	}
+
+	    if (pc.id == 0){
+	    	Time.printf("%f\n", T.x(tt))
+	    	}
+            
+        }
+                    out.close()
+                    outv.close()
+                    outisyn.close()
+
+}
+
+
+
+
+proc morph_to_file(){localobj c
+
+	geom.printf("%d %d %20.10e %20.10e %20.10e ", $1, $2, $3, $4, $5)
+	geom.printf("%20.10e %20.10e %20.10e %10.6e \n", $6, $7, $8, $9/2)		
+
+}
+
+
+proc nodes_to_file(){localobj c
+
+    tmp = ($3  +0.5)/$4
+    nodes.printf("%d %d %d %f %f %f\n", $1, $2, $3, $5*(1 - tmp) + $8*(tmp),  $6*(1 - tmp) + $9*(tmp),  $7*(1 - tmp) + $10*(tmp))
+
+}
+

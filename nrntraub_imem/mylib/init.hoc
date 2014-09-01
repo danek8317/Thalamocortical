@@ -1,0 +1,154 @@
+objref IM,V_, T, tvec, Time, sum_I//, ss
+
+if (n_currents > 0){n_curr = n_currents}else{n_curr = 1}
+objref Add_curr[n_curr], Add_curr_cond[n_curr], Add_curr_save[n_curr]
+
+objref Not_ionic_currents, Not_ionic_currents_signs
+objref yeven[ 3 + n_currents ]
+
+{
+IM = new List()
+V_ = new List()
+
+Not_ionic_currents = new List("String")
+Not_ionic_currents_signs = new Vector()
+
+for i = 0,n_currents-1{
+	Add_curr_save[i] = new List()
+	}
+
+tvec = new Vector()
+Time = new File()
+sum_I = new List()
+last = tstart
+}
+
+objref save_pop
+
+{save_pop = new Vector(14)}
+
+
+if (select_pop){
+    save_pop.x[0] = save_suppyrRS
+    save_pop.x[1] = save_suppyrFRB
+    save_pop.x[2] = save_supbask
+    save_pop.x[3] = save_supaxax
+    save_pop.x[4] = save_supLTS
+    save_pop.x[5] = save_spinstell
+    save_pop.x[6] = save_tuftIB
+    save_pop.x[7] = save_tuftRS
+    save_pop.x[8] = save_nontuftRS
+    save_pop.x[9] = save_deepbask
+    save_pop.x[10] = save_deepaxax
+    save_pop.x[11] = save_deepLTS
+    save_pop.x[12] = save_TCR
+    save_pop.x[13] = save_nRT
+    }else{
+	    for i = 0,13{
+	    	save_pop.x[i] = 1}
+    }
+
+
+objref nodes, sum_i_all, comps, out, outv, outisyn, geom
+//objref nodessyn, nodessyn_e
+
+if (save_currents){
+    open_file_to_write("sum_i/sum_i", dir, pc.id, sum_i_all)
+    open_file_to_write("i/iout", dir, pc.id,out)
+    open_file_to_write("v/oout", dir, pc.id, outv)
+    open_file_to_write("isyn/outisyn", dir, pc.id,outisyn)
+
+    if (pc.id == 0){
+    	sprint(str,"%s/time.dat",dir)
+    	Time.wopen(str)
+    	}
+    }
+
+{
+if (geometry) {open_file_to_write("geometry/punkty", dir, pc.id, geom) }
+if (point_current_position ) { open_file_to_write("nodes/nodes", dir, pc.id,nodes) }
+}
+
+/*sprint(str, "%s/isyn/nodessyn%d.dat",dir, pc.id)
+open_file_to_write(str,nodessyn)
+
+
+sprint(str, "%s/isyn/nodessyn_i%d.dat",dir, pc.id)
+nodessyn_i.wopen(str)
+*/
+
+
+
+
+proc init_all_data(){local i ,comp,  nr_cell  localobj c, file
+    set_env_for_cvode_active()
+	time_size = (tstop - tstart)/t_step
+	comp = 0
+	s = 0
+
+    file = new File(add_curr_params_path)
+    file.ropen()
+
+
+     for i = 0, n_not_ionic_curr-1{
+        Not_ionic_currents.append(new String())
+        file.scanstr(Not_ionic_currents.o(i).s)
+        if (pc.id ==0){print Not_ionic_currents.o(i).s}
+        Not_ionic_currents_signs.append(file.scanvar() )
+        }
+
+    for i = 0, n_currents-1{
+	
+        Add_curr_cond[i] = new String()
+        file.scanstr(Add_curr_cond[i].s )
+	if (pc.id == 0){print Add_curr_cond[i].s ,i}
+        }
+
+    for i = 0, n_currents-1{
+        Add_curr[i] = new String()
+        file.scanstr(Add_curr[i].s)
+	if (pc.id ==0){print Add_curr[i].s,i}
+        }
+
+
+
+	nr_cell = -1
+	for k = 0, cells.count()-1{
+		c = cells.object(k)
+		nr_cell =  base_gid(gidvec.x(k))
+		sum_I.append(new Vector())
+
+
+		d = c.type()
+		forsec c.all{  
+			sscanf(secname(), "%*[^0-9]%*d%*[^0-9]%d",&comp)
+			if (save_pop.x[d] == 0){continue}
+		
+				for  l = 0, nseg-1 {
+                    n_ = n3d() -1                    
+
+                    if (geometry){ 
+                        morph_to_file(nr_cell, comp, x3d(0), y3d(0), z3d(0),x3d(n_), y3d(n_), z3d(n_), diam )
+                        }
+
+                    if (point_current_position){
+                        nodes_to_file(nr_cell, comp, l, nseg, x3d(0), y3d(0), z3d(0), x3d(n_), y3d(n_), z3d(n_))
+                        }
+
+					V_.append(new Vector())
+					IM.append(new Vector())	
+
+					for i = 0,n_currents-1{
+						Add_curr_save[i].append(new Vector())
+					    }
+					}
+
+			}
+		}
+	       
+}
+
+init_all_data()
+{load_file("saving_data/saving_data.hoc")}
+set_passive()
+close_fast_na()

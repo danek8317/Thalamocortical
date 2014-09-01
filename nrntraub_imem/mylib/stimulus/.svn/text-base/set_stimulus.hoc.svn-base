@@ -1,0 +1,10 @@
+
+j = 12
+set_izap_curr(TCR_base, Num_pop.x(j),  2, 500, 100, 12.5, 12.5)
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+suppyr
+suppyr
+interneuron
+interneuron
+interneuron
+spiny
+tuftpyr
+tuftpyr
+nontuftpyr
+interneuron
+interneuron
+interneuron
+tcr
+nrt
+

@@ -1,0 +1,39 @@
+IClamp_const -1
+IClamp -1
+GABAA 1
+NMDA 1
+AMPA 1
+gGapPar 0
+PulseSyn 0
+gGap 0
+
+
+cond=1
+cond=1
+cond=1
+cond=1
+cond=1
+cond=1
+cond=ismembrane("ca_ion")
+cond=1
+cond=ismembrane("pas")
+cond=ismembrane("ar")
+cond=ismembrane("cat")
+cond=ismembrane("cat_a")
+
+a=ss.x(3)
+a=ss.x(4)
+a=i_cap(tmp)*area(tmp)*1e-2
+a=ss.x(2)
+a=ina*area(tmp)*1e-2			
+a=ik(tmp)*area(tmp)*1e-2
+a=ica(tmp)*area(tmp)*1e-2
+a=ss.sum()
+a=i_pas(tmp)*area(tmp)*1e-2
+a=i_ar*area(tmp)*1e-2
+a=i_cat*area(tmp)*1e-2
+a=i_cat_a(tmp)*area(tmp)*1e-2
+
+
+
+

@@ -1,0 +1,39 @@
+
+j = 12
+
+set_input_curr( TCR_base, Num_pop.x(j), 3,2,300)
+
+//set_izap_curr(TCR_base, Num_pop.x(j),  1, 500, 100, 12.5, 12.5)
+
+set_input_curr(suppyrRS_base, Num_pop.x(0), 2,3,100)
+set_input_curr(suppyrFRB_base, Num_pop.x(1), 2,3,100)
+
+set_input_curr( spinstell_base,Num_pop.x(5), 2,3,100)
+
+set_input_curr(tuftIB_base, Num_pop.x(6), 2,3,100)
+set_input_curr( tuftRS_base,Num_pop.x(7), 2,3,100)
+//set_input_curr(tuftIB_base, Num_pop.x(6), 0.5,103,0)
+//set_input_curr( tuftRS_base,Num_pop.x(7), 0.5,103,0)
+//set_input_curr( nontuftRS_base, Num_pop.x(8), 0.5*0.75,103,0)
+
+//set_input_curr( nontuftRS_base, Num_pop.x(8), 2,3,100)
+
+
+//set_input_curr(suppyrRS_base, Num_pop.x(0), 2,40,100)
+//set_input_curr(suppyrFRB_base, Num_pop.x(1), 2,40,100)
+
+//set_input_curr( spinstell_base,Num_pop.x(5), 2,40,100)
+
+//set_input_curr(tuftIB_base, Num_pop.x(6), 2,20,100)
+//set_input_curr( tuftRS_base,Num_pop.x(7), 2,20,100)
+
+
+//set_input_curr( nontuftRS_base, Num_pop.x(8), 2,40,100)
+
+
+
+
+
+
+
+
