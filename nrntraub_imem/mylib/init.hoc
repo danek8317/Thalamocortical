@@ -147,8 +147,7 @@ proc init_all_data(){local i ,comp,  nr_cell  localobj c, file
 		}
 	       
 }
-
-init_all_data()
 {load_file("saving_data/saving_data.hoc")}
+init_all_data()
 set_passive()
 close_fast_na()

@@ -20,7 +20,7 @@ shapes_map_file.close()
 
 proc basic_shape(){local i localobj shape_file,s
 	
-/*    s = new String()
+    s = new String()
     sprint(s.s, "mylib/shape3d/cells_shape/%s_shape.dat", shapes_map.o($o1.type).s)
     shape_file = new File(s.s)
     shape_file.ropen()
@@ -54,7 +54,7 @@ proc basic_shape(){local i localobj shape_file,s
         //$o1.comp[ scan[0] ] {pt3dclear() pt3dadd( scan[1], scan[2],scan[3],scan[4] ) pt3dadd( scan[5],scan[6],scan[7],scan[8]) pt3dadd(scan[9],scan[10],scan[11],scan[12])}
 
         }
-shape_file.close()*/
+shape_file.close()
     }
 
 
