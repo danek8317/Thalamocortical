@@ -19,7 +19,7 @@ while (! shapes_map_file.eof()){
 shapes_map_file.close()
 
 proc basic_shape(){local i localobj shape_file,s
-	
+	print "basic_shape"
     s = new String()
     sprint(s.s, "mylib/shape3d/cells_shape/%s_shape.dat", shapes_map.o($o1.type).s)
     shape_file = new File(s.s)
@@ -36,8 +36,8 @@ proc basic_shape(){local i localobj shape_file,s
                 //sscanf(tmp_str, "%lf", &scan[i])
                 shape_file.scanstr(scan[i].s)
                 }
-          if ((0) ) {
-        print shapes_map.o($o1.type).s,scan[0], scan[1], scan[2],scan[3],scan[4],scan[5],scan[6],scan[7],scan[8],scan[9],scan[10],scan[11],scan[12], pc.id}
+         /* if ((0) ) {
+        print shapes_map.o($o1.type).s,scan[0], scan[1], scan[2],scan[3],scan[4],scan[5],scan[6],scan[7],scan[8],scan[9],scan[10],scan[11],scan[12], pc.id}*/
 
         sprint(s.s, "~comp[%s]{ pt3dconst(0) pt3dclear() pt3dadd( %s, %s, %s, %s)}", scan[0].s, scan[1].s, scan[2].s, scan[3].s, scan[4].s)
         execute(s.s, $o1)

@@ -160,12 +160,13 @@ print base_ , $s2
 
 load_file("mylib/shape3d/extra_shapes.hoc")
 
-/*
+
 func cell_append() {
         cells.append($o1)
         $o1{print secname(), "WWWWWWWWWWWWW"}
         print secname()
-        //basic_shape($o1)
+        basic_shape($o1)
+        $o1{rotation($1)}
         position_3d($o1,$2,$3,$4)
         print secname(), "RRRRRRRRRRRRR"
         //position_3d($o1,$2,$3,$4)
@@ -180,4 +181,4 @@ func cell_append() {
         return cells.count - 1
 }
 
-*/
+
