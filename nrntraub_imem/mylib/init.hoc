@@ -52,6 +52,7 @@ if (select_pop){
 objref nodes, sum_i_all, comps, out, outv, outisyn, geom
 //objref nodessyn, nodessyn_e
 
+
 if (save_currents){
     open_file_to_write("sum_i/sum_i", dir, pc.id, sum_i_all)
     open_file_to_write("i/iout", dir, pc.id,out)
@@ -64,10 +65,7 @@ if (save_currents){
     	}
     }
 
-{
-if (geometry) {open_file_to_write("geometry/punkty", dir, pc.id, geom) }
-if (point_current_position ) { open_file_to_write("nodes/nodes", dir, pc.id,nodes) }
-}
+
 
 /*sprint(str, "%s/isyn/nodessyn%d.dat",dir, pc.id)
 open_file_to_write(str,nodessyn)
@@ -126,14 +124,6 @@ proc init_all_data(){local i ,comp,  nr_cell  localobj c, file
 		
 				for  l = 0, nseg-1 {
                     n_ = n3d() -1                    
-
-                    if (geometry){ 
-                        morph_to_file(nr_cell, comp, x3d(0), y3d(0), z3d(0),x3d(n_), y3d(n_), z3d(n_), diam )
-                        }
-
-                    if (point_current_position){
-                        nodes_to_file(nr_cell, comp, l, nseg, x3d(0), y3d(0), z3d(0), x3d(n_), y3d(n_), z3d(n_))
-                        }
 
 					V_.append(new Vector())
 					IM.append(new Vector())	

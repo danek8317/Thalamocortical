@@ -36,14 +36,10 @@ Map_names[13] = new String("nRT")
 
 strdef  add_curr_params_path
 
-shape3d = 1
-
 save_currents = 1
 add_curr_params_path = "saving_data/additional_curr.dat"
 n_currents = 12
 n_not_ionic_curr = 8
-geometry = 1
-point_current_position = 0
 select_pop = 0
 save_suppyrRS = 0
 save_suppyrFRB = 0
@@ -63,12 +59,6 @@ next_ = 15
 t_step = 0.1
 tstart = 0
 
-if (shape3d ){
-	mytstop = 0
-	save_currents = 0
-	geometry = 1
-	point_current_position = 1
-	}
 /////////////////////////////////////////////////////////////// end params for saving_data.hoc
 
 
@@ -108,36 +98,6 @@ turn_on_nontuftRS = 1
 
 ////////////////////////////////////////////////////////////// end params for stimulus.hoc and vecevent.hoc
 
-
-
-///////////////////////////////////////////////////////////// params for coor.hoc
-
-
-strdef pops_position_file, realistic_random_dens
-pops_position_file= "mylib/shape3d/pops_position.dat"
-realistic_random_dens = "norm_dens.txt"
-
-objref   spread_cell, depth_cell, position_style
-
-spread_cell = new Vector()
-depth_cell = new Vector()
-position_style = new String()
-position_style.s ="myposition"//"traub", "realistic", "myposition"
-
-powtorzenia = 1
-column_width = 400
-//top = 300 //where is the top of the highest layer - not used
-
-//space_between_cells = 10 // microns
-
-objref ve
-
-{ve = new Vector(37,0)
-ve.indgen(-1850,-50,50)}
-
-
-
-//////////////////////////////////////////////////////////////////
 
 
 /*
