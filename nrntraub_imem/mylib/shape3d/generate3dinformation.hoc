@@ -1,0 +1,154 @@
+setuptime = 1
+
+
+load_file("hoc/defvar.hoc")
+load_file("hoc/traubcon.hoc")
+load_file("mylib/shape3d/extra_shapes.hoc")
+load_file("cells/deepaxax_template.hoc")
+load_file("cells/deepbask_template.hoc")
+load_file("cells/deepLTS_template.hoc")
+load_file("cells/nontuftRS_template.hoc")
+load_file("cells/nRT_template.hoc")
+load_file("cells/spinstell_template.hoc")
+load_file("cells/supaxax_template.hoc")
+load_file("cells/supbask_template.hoc")
+load_file("cells/supLTS_template.hoc")
+load_file("cells/suppyrFRB_template.hoc")
+load_file("cells/suppyrRS_template.hoc")
+load_file("cells/TCR_template.hoc")
+load_file("cells/tuftIB_template.hoc")
+load_file("cells/tuftRS_template.hoc")
+serial = 1
+load_file("net/durand.hoc")
+
+
+
+one_tenth_ncell = 0
+cells_type = 14
+
+objref Map_names, Num_pop, Pop_depth, Pop_size, randobj0
+
+{Map_names = new List()
+Map_names.append(new String("suppyrRS"))
+Map_names.append(new String("suppyrFRB"))
+Map_names.append(new String("supbask"))
+Map_names.append(new String("supaxax"))
+Map_names.append(new String("supLTS"))
+Map_names.append(new String("spinstell"))
+Map_names.append(new String("tuftIB"))
+Map_names.append(new String("tuftRS"))
+Map_names.append(new String("nontuftRS"))
+Map_names.append(new String("deepbask"))
+Map_names.append(new String("deepaxax"))
+Map_names.append(new String("deepLTS"))
+Map_names.append(new String("TCR"))
+Map_names.append(new String("nRT"))}
+
+{
+Pop_size = new Vector()
+Num_pop = new Vector()
+Pop_depth = new Vector()
+
+//suppyrRS,suppyrFRB, supbask, supaxax, supLTS, spinstell, tuftIB, tuftRS, 
+//nontuftRS, deepbask, deepaxax, deepLTS, TCR, nRT 
+
+Num_pop.append(1000,50,90,90,90,240,800,200,500,100,100,100,100,100)
+Pop_size.append(400, 400, 400, 400,	400, 300, 500, 500,	500, 1000, 1000, 1000, 100, 100)
+Pop_depth.append(0, 0, 0, 0, 0, -400, -700, -700, -1200, -700, -700, -700, -5000,-5100)
+
+if (one_tenth_ncell) {    Num_pop.div(10)}
+}
+
+repetitions = 1
+
+column_width = 400
+column_radius = column_width/2
+
+randobj0 = new Random(1234)
+randobj0.uniform(0,1)
+
+objref point_sources,my_cell, geometry
+point_sources = new File()
+geometry = new File()
+strdef str2, str1, str3
+
+proc create_cell(){
+		strdef proc_exec, str1
+        sprint(str1,"my_cell = new %s(0)",$s1)
+        print $s1
+
+        if (serial) {
+             execute(str1)
+           } else {
+              sprint(proc_exec,"new %s(0)",$s1)
+              par_create(proc_exec)
+           }
+
+}
+
+proc write_nodes(){local i, alpha_, coorx, coory, coorz, beta, r
+        
+        point_sources.aopen(str2)
+        geometry.aopen(str3)
+		create_cell($o1.s)
+
+
+        for i=0, $2-1 {
+			  //cell's rotation angle
+              alpha_ = randobj0.repick()*360
+
+
+              // angle and r in  polar coordinate system
+              beta_ = randobj0.repick()*360
+              r = sqrt(randobj0.repick())*column_radius
+
+              //[coory, coorz, coorx] - translation vector 
+              coorx = r*cos(beta_)
+              coory = r*sin(beta_)
+              coorz = randobj0.repick()*$3 + $4
+
+              x = my_cell.x
+              y = my_cell.y
+              z = my_cell.z
+
+              forall{
+                        comp = 0
+                        sscanf(secname(), "%*[^0-9]%*d%*[^0-9]%d",&comp)
+                        n_ =  n3d() -1
+
+                        for l = 0,nseg-1{
+                                tmp = (l   +0.5)/nseg
+                                x0 =(x3d(0)*cos(alpha_) - z3d(0)*sin(alpha_) - x) +  coory
+                                xn =  (x3d(n_)*cos(alpha_) - z3d(n_)*sin(alpha_) - x) +  coory
+                                y0 = (y3d(0) - y) + coorz
+                                yn = (y3d(n_) - y) + coorz
+                                z0 = (x3d(0)*sin(alpha_)+z3d(0)*cos(alpha_) - z) + coorx
+                                zn = (x3d(n_)*sin(alpha_)+z3d(n_)*cos(alpha_) - z) +  coorx
+                                 //x3d(0)*(1 - tmp) + x3d(n_)*(tmp),  y3d(0)*(1 - tmp) + y3d(n_)*(tmp),  z3d(0)*(1 - tmp) + z3d(n_)*(tmp)
+                                point_sources.printf("%d %d %d %f %f %f\n",cell, comp,l ,x0*(1 - tmp) + xn*(tmp),  y0*(1 - tmp) + yn*(tmp),  z0*(1 - tmp) + zn*(tmp))
+                                geometry.printf("%d %d %d %f %f %f %f %f %f %f\n",cell, comp,l ,x0,  y0,  z0, xn,  yn,  zn, (diam/2))
+                                
+                                }
+
+                }
+
+               //point_sources.printf("\n", i)
+
+
+           cell = cell + 1
+        }
+}
+
+for j =1, repetitions {
+
+	sprint(str2, "dat/nodes/data_art/nodes_%d.dat",j)
+	sprint(str3, "dat/geometry/data_art/points_%d.dat",j)
+	point_sources.wopen(str2)
+
+	for i= 0, cells_type -1{
+		write_nodes(Map_names.o(i), Num_pop.x(i),-Pop_size.x(i),Pop_depth.x(i))
+	}
+
+	point_sources.close
+	geometry.close
+}
