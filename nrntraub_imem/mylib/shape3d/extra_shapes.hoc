@@ -4,7 +4,7 @@ strdef tmp_str
 //double scan[13]
 
 
-shapes_map_file = new File("mylib/shape3d/shapes_map.txt")
+shapes_map_file = new File("shapes_map.txt")
 shapes_map = new List()
 
 act = 0
