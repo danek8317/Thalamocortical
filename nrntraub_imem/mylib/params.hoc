@@ -1,18 +1,20 @@
-//usunelam wejscie z nrt
-strdef dir
-objref Num_pop
 
+strdef dir //path to data dir
 dir = "/home/hglabska/data2/artykul_data/git/Thalamocortical_imem/data/"
-sample = 0  //change the random numbers?
-cells_type = 14
+
+objref Num_pop //number of cells in every population
+
 {Num_pop = new Vector()
 Num_pop.append(1000,50,90,90,90,240,800,200,500,100,100,100,100,100)}
 if (one_tenth_ncell) {
 	Num_pop.div(10)
 }
 
-n_cell = Num_pop.sum()
-objref Map_names[cells_type]
+cells_type = 14 //how many different populations are in the model
+
+n_cell = Num_pop.sum() // how many calle are in the model
+
+objref Map_names[cells_type] //population's names
 {
 Map_names[0] = new String("suppyrRS")
 Map_names[1] = new String("suppyrFRB")
@@ -30,17 +32,26 @@ Map_names[12] = new String("TCR")
 Map_names[13] = new String("nRT")
 }
 
-
-
 ///////////////////////////////////////////////////////////// params for saving_data.hoc
 
-strdef  add_curr_params_path
+n_currents = 12 //how many single currents you want to truck
+n_not_ionic_curr = 8  // how many not ionic currents you want to truck
 
-save_currents = 1
+strdef  add_curr_params_path //path to the file where single currents are described
+                             //the file contains:
+                             // 1."n_not_ionic_curr" lines which contains name of not ionic current
+                             // with sign {-1,0,1} which tells how the current confluence transmembrane current
+                             // 2."n_currents" lines with conditions when the current should be truck, e.g
+                             // you can't truck Ca current if there are no Ca chanels in the segment
+                             // 3."n_currents" lines with definition of currents which you want to truck
+                             // ss object is defined in saving_data.hoc contains not_ionic_sources defined at the top of the file
 add_curr_params_path = "saving_data/additional_curr.dat"
-n_currents = 12
-n_not_ionic_curr = 8
-select_pop = 0
+
+save_currents = 1  //do you want to save currents
+
+select_pop = 0  // 1  if you want to save only data from single population (if yes, you should set also proper save_...)
+                // 0  if you want to save data from all populations or nothing
+
 save_suppyrRS = 0
 save_suppyrFRB = 0
 save_supbask = 0
@@ -55,9 +66,12 @@ save_deepaxax = 0
 save_deepLTS = 0
 save_TCR = 0
 ave_nRT = 0
-next_ = 15
-t_step = 0.1
-tstart = 0
+
+next_ = 15   // some technical parameter, time interval in ms - how you want to save data (it can be to big because
+             // the data can be to large to fit memory size, that also shouldn't be to small since to write the data
+             // you have to synchronize the cores.
+t_step = 0.1 // data resolution (in ms)
+tstart = 0   // time in ms, when to start saving data (does't matter if you don't want to save currents)
 
 /////////////////////////////////////////////////////////////// end params for saving_data.hoc
 
@@ -65,20 +79,24 @@ tstart = 0
 
 ////////////////////////////////////////////////////////////// params for stimulus.hoc and vecevent.hoc
 
-strdef  spikes_dir
+// definition of additional stimulus
+
+use_vecstim = 0 //do you disconnet the network and feed neurons with artificial spikes?
+
+strdef  spikes_dir  //if  use_vecstim = 1, spikes_dir is path to artificial spikes time
 spikes_dir = "/path/to/input/spikes/dir/"
 
 
-scale_TCR_output = 0
-use_vecstim = 0
-use_input_curr = 1
-active_ions = 0
-passive_axon = 0
-passive_soma = 0
-passive_dendrites = 0
-set_zero_fast_na =0
+scale_TCR_output = 0   // ??????????????
+use_input_curr = 1  //??
 
-input_electrode = 0
+active_ions = 0   // ! not intuitive parmeter, set active_ions =1 if you want to CLOSE ! all active chanels
+passive_axon = 0  // 1 purely passive passive_axon // 0 normal case
+passive_soma = 0  // 1 passive passive_axon  // 0 normal case
+passive_dendrites = 0 // 1 passive passive_axon // 0 normal case
+set_zero_fast_na =0 //1 fast_na are closed // 0 normal case
+
+input_electrode = 0 // not sure if it works - add additional electrode, only cells near the elctrode are stimulated
 xelectrode =  1 
 yelectrode =  -1700 
 zelectrode = 1 

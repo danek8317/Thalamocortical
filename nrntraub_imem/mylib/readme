@@ -50,3 +50,9 @@ izap.mod
 izap2.mod
 vecevent.mod
 
+basic parameters are defined in init.hoc (as in oryginal code)
+additional parameters are defined in mylib/params.hoc
+additional stimulus can be add in mylib/set_stimulus.hoc
+	set_input_curr - adds constatnt current
+	set_izap_curr - adds sinusoidal current
+
