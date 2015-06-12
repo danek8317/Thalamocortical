@@ -1,0 +1,42 @@
+
+
+//definition of extra stimulus
+
+//set_input_curr - constant current
+//		$1 - where the stimulated population will start
+//		$2 - how many cells are stimulated
+//		$3 - stimulus amplitude
+//		$4 - stimulus duration
+//		$5 - stimulus delay
+//
+//e.g
+//j = 0  //populations get numbers from 0 (0 is suppyrRS)
+//set_input_curr(suppyrRS_base, Num_pop.x(j), 2,3,100)
+//
+
+
+
+//set_izap_curr - sinusoidal current, params:
+//		$1 - where the stimulated population will start
+//		$2 - how many cells are stimulated
+//		$3 - maximal amplitude
+//		$4 - stimulus duration
+//		$5 - stimulus delay
+//		$6 - oscilation frequency
+//		$7 - oscilation frequency (if it is different than $5 than the stimulus 
+//		should gradially change from frequency $5 up to $6)
+// e.g 
+//j = 12  //populations get numbers from 0 (0 is suppyrRS)
+//set_izap_curr(TCR_base, Num_pop.x(j),  1, 500, 100, 12.5, 12.5)
+
+j = 12  //populations get numbers from 0 (0 is suppyrRS)
+set_izap_curr(TCR_base, Num_pop.x(j),  1, 500, 100, 200, 200)
+
+
+
+
+
+
+
+
+
