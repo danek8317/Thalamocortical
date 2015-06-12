@@ -50,31 +50,19 @@ if (select_pop){
 
 
 objref nodes, sum_i_all, comps, out, outv, outisyn, geom
-//objref nodessyn, nodessyn_e
 
 
 if (save_currents){
-    open_file_to_write("sum_i/sum_i", dir, pc.id, sum_i_all)
-    open_file_to_write("i/iout", dir, pc.id,out)
-    open_file_to_write("v/oout", dir, pc.id, outv)
-    open_file_to_write("isyn/outisyn", dir, pc.id,outisyn)
+    open_file_to_write(sum_of_transmembrane_current_file_prefix, dir, pc.id, sum_i_all)
+    open_file_to_write(transmembrane_current_file_prefix, dir, pc.id,out)
+    open_file_to_write(voltage_file_prefix, dir, pc.id, outv)
+    open_file_to_write(single_currents_file_prefix, dir, pc.id,outisyn)
 
     if (pc.id == 0){
     	sprint(str,"%s/time.dat",dir)
     	Time.wopen(str)
     	}
     }
-
-
-
-/*sprint(str, "%s/isyn/nodessyn%d.dat",dir, pc.id)
-open_file_to_write(str,nodessyn)
-
-
-sprint(str, "%s/isyn/nodessyn_i%d.dat",dir, pc.id)
-nodessyn_i.wopen(str)
-*/
-
 
 
 

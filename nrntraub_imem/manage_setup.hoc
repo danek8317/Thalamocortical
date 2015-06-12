@@ -37,7 +37,7 @@ if (use_load_balance) { use_traubexact = 0 } // cannot use with load balance
 {localloadfile("hoc/traubcon.hoc")}
 {load_file("mylib/lib.hoc")}
 {load_file("mylib/params.hoc")}
-{localloadfile("mylib/shape3d/extra_shapes.hoc")}
+{load_file("mylib/shape3d/extra_shapes.hoc")}
 {localloadfile("cell_templates.hoc")}
 {localloadfile("net/network_specification_interface.hoc")}
 if (!serial) {localloadfile("hoc/parlib2.hoc")}

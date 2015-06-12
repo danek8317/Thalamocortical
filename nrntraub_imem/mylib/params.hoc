@@ -1,4 +1,4 @@
-
+//should be load in manage_setup.hoc
 strdef dir //path to data dir
 dir = "/home/hglabska/data2/artykul_data/git/Thalamocortical_imem/data/"
 
@@ -35,7 +35,7 @@ Map_names[13] = new String("nRT")
 ///////////////////////////////////////////////////////////// params for saving_data.hoc
 
 n_currents = 12 //how many single currents you want to truck
-n_not_ionic_curr = 8  // how many not ionic currents you want to truck
+n_not_ionic_curr = 8  // how many not ionic currents you want to truck (does't matter if n_currents = 0 )
 
 strdef  add_curr_params_path //path to the file where single currents are described
                              //the file contains:
@@ -68,10 +68,21 @@ save_TCR = 0
 ave_nRT = 0
 
 next_ = 15   // some technical parameter, time interval in ms - how you want to save data (it can be to big because
-             // the data can be to large to fit memory size, that also shouldn't be to small since to write the data
-             // you have to synchronize the cores.
+             // the data can be to large to fit memory size, that also shouldn't be to small mainly on architectures like bluegene where
+			 // only few nodes is dedicated to i/o operations.
+
 t_step = 0.1 // data resolution (in ms)
 tstart = 0   // time in ms, when to start saving data (does't matter if you don't want to save currents)
+
+
+//data will be saved separately for every core, data files prefix is defined below
+//data file suffix is core_id + ".dat"
+
+strdef transmembrane_current_file_prefix, sum_of_transmembrane_current_file_prefix, voltage_file_prefix, single_currents_file_prefix 
+transmembrane_current_file_prefix = "/i/iout" 
+sum_of_transmembrane_current_file_prefix = "/sum_i/sum_i"   // just for testing sum of all the current in a single cell should be 0
+voltage_file_prefix = "/i/iout"
+single_currents_file_prefix = "/isyn/outisyn"
 
 /////////////////////////////////////////////////////////////// end params for saving_data.hoc
 
@@ -97,35 +108,9 @@ passive_dendrites = 0 // 1 passive passive_axon // 0 normal case
 set_zero_fast_na =0 //1 fast_na are closed // 0 normal case
 
 input_electrode = 0 // not sure if it works - add additional electrode, only cells near the elctrode are stimulated
-xelectrode =  1 
+xelectrode =  1   //xelectrode, yelectrod, zelectrod electrode position (x,y,z) coordinations
 yelectrode =  -1700 
 zelectrode = 1 
-electrode_range = 50 
-turn_on_suppyrRS = 1
-turn_on_suppyrFRB = 1
-turn_on_supbask = 1
-turn_on_supaxax = 1
-turn_on_supLTS = 1
-turn_on_spinstell = 1
-turn_on_tuftIB = 1
-turn_on_tuftRS = 1
-turn_on_deepbask = 1
-turn_on_deepaxax = 1
-turn_on_deepLTS = 1
-turn_on_nontuftRS = 1
+electrode_range = 50  // maximal distance from electrode in micrometers to get the stimulus
 
 ////////////////////////////////////////////////////////////// end params for stimulus.hoc and vecevent.hoc
-
-
-
-/*
-"/sum_i/sum_i"
-"/i/iout"
-"/v/oout"
-"/isyn/nodessyn"
-"/isyn/outisyn"
-*/
-
-
-
-
