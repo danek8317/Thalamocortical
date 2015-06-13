@@ -64,7 +64,7 @@ proc position_3d(){local i
 	old_L = L
 	old_diam = diam
         for i = 0, n3d()-1 {pt3dchange(i, $2+x3d(i) -$o1.x, \
-      			$3+y3d(i) -$o1.y, $4+z3d(i),diam3d(i) - $o1.z)
+      			$3+y3d(i) -$o1.y, $4+z3d(i) - $o1.z, diam3d(i) )
         		}
 	L = old_L
 	diam = old_diam

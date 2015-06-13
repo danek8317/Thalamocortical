@@ -66,7 +66,7 @@ modules:
 
 	saving_data
 		saving_data.hoc - contains definition of functions to get, interpolate (with a constance 
-			time step -> "t_tep" parameter in params.hoc - since simulation are with a variable time step)
+			time step -> "t_step" parameter in params.hoc - since simulation are with a variable time step)
 			and write the data 
 			
 		additional_curr.dat - specification of single currents which you want to write, 
@@ -82,9 +82,10 @@ modules:
 		cells_shape
 			..._shape.dat - single cell 3d morphology
 
-		generate3dinformation.hoc
-		extra_shape.hoc
-		shapes_mat.txt
+		generate3dinformation.hoc - code in hoc to generate random 3d positions 
+		extra_shape.hoc - 
+		shapes_mat.txt - mapping from the population to morphology type from cells_shape folder
+			 ( e.g. n-th line refer to the n-th population population)
 		
 
 	stimulus
@@ -95,6 +96,17 @@ modules:
 			The stimulator is creted if "use_vecstim = 1" is in params.hoc
 		set_stimulus.hoc - set stimulus (constant or sinusoidal) - execute procedures defined in stimulus
 			
-		
-To run your own siulation you should be enough to modify : init.hoc, mylib/params.hoc and mylib/set_stimulus.hoc
+Running
+=========================
+=========================		
+1. Modify parameters, set stimulus in files
+	 init.hoc, mylib/params.hoc and mylib/set_stimulus.hoc
+2. Compile modfiles:
+	nrnivmodl mod
+	( folder i686, x86_64 , powerpc or other will appear)
+3. run the simulation
+	mpirun -np n_cores i686/special -mpi init.hoc (depending on an architecture there can be x86_64/special or
+	powerpc/special e.t.c)
 
+   or  calculate 3d positions:
+	mpirun -np n_cores i686/special -mpi generate3dinformation.hoc
