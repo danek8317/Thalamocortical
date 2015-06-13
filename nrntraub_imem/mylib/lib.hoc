@@ -54,7 +54,39 @@ proc interpolation(){
 }
 
 
-load_file("passive.hoc")
+
+
+proc passive(){
+
+        forsec $o1{
+	if (pc.id == 0){print secname()}
+                spine_area_multiplier  = 0
+        if (ismembrane("napf_spinstell")){gbar_napf_spinstell *= spine_area_multiplier}
+        if (ismembrane("nap")) { gbar_nap *= spine_area_multiplier }
+        if (ismembrane("napf")) { gbar_napf *= spine_area_multiplier }
+        if (ismembrane("napf_tcr")) { gbar_napf_tcr *= spine_area_multiplier }
+        if (ismembrane("naf2")) { gbar_naf2 *= spine_area_multiplier }
+        if (ismembrane("naf_tcr")) { gbar_naf_tcr *= spine_area_multiplier }
+        if (ismembrane("naf")) { gbar_naf *= spine_area_multiplier }
+        if (ismembrane("kc_fast")) { gbar_kc_fast *= spine_area_multiplier }
+        if (ismembrane("kc")) { gbar_kc *= spine_area_multiplier }
+        if (ismembrane("kahp")) { gbar_kahp *= spine_area_multiplier }
+        if (ismembrane("kahp_slower")) { gbar_kahp_slower *= spine_area_multiplier }
+        if (ismembrane("km")) { gbar_km *= spine_area_multiplier }
+        if (ismembrane("kdr_fs")) { gbar_kdr_fs *= spine_area_multiplier }
+        if (ismembrane("kdr")) { gbar_kdr *= spine_area_multiplier }
+        if (ismembrane("ka")) { gbar_ka *= spine_area_multiplier }
+        if (ismembrane("ka_ib")) { gbar_ka_ib *= spine_area_multiplier }
+        if (ismembrane("k2")) { gbar_k2 *= spine_area_multiplier }
+        if (ismembrane("cal")) { gbar_cal *= spine_area_multiplier }
+        if (ismembrane("cat")) { gbar_cat *= spine_area_multiplier }
+        if (ismembrane("cat_a")) { gbar_cat_a *= spine_area_multiplier }
+        if (ismembrane("ar")) { gbar_ar *= spine_area_multiplier }
+
+                }
+
+}
+
 proc set_passive(){
 
 for c = 0, cells.count-1{

@@ -99,7 +99,8 @@ spikes_dir = "/path/to/input/spikes/dir/"
 
 
 scale_TCR_output = 0   // ??????????????
-use_input_curr = 1  //??
+use_input_curr = 1     //do you use any additional stimulus (defined in set_stimulus.hoc)?
+
 
 active_ions = 0   // ! not intuitive parmeter, set active_ions =1 if you want to CLOSE ! all active chanels
 passive_axon = 0  // 1 purely passive passive_axon // 0 normal case
