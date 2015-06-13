@@ -1,10 +1,7 @@
 objref iclamp_list, iclampobj
 iclamp_list = new List() 
 
-
-
-
-
+//contant stimulus injected into the soma
 proc set_input_curr() {local i, gid  localobj c, clmp
 
 	if (!use_input_curr) { return }
@@ -19,6 +16,8 @@ proc set_input_curr() {local i, gid  localobj c, clmp
 	}
 }
 
+//sinusoidal stimulus injected into the soma - defined in zap.mod
+//http://www.neuron.yale.edu/ftp/ted/neuron/izap.zip
 proc set_izap_curr() {local i, gid  localobj c, clmp
 
 	if (!use_input_curr) { return }
@@ -34,11 +33,10 @@ proc set_izap_curr() {local i, gid  localobj c, clmp
 	}
 }
 
-
+//defined in zap2.mod
 proc set_izap_curr2() {local i, gid  localobj c, clmp
 
         if (!use_input_curr) { return }
-
         for i = 1, $2 if ((gid = targetcomp_exists($1+i, 1)) >= 0) {
                 c = pc.gid2obj(gid)
                 c.comp[1] clmp = new Izap2(0.5)
@@ -47,44 +45,10 @@ proc set_izap_curr2() {local i, gid  localobj c, clmp
                 clmp.del = $5
                 iclamp_list.append(clmp)
         }
-}
+}// not sure if it works - add additional electrode, only cells near the elctrode are stimulated
 
 
-proc set_izap_curr3() {local i, gid  localobj c, clmp, random_input
-
-        random_input =  new Random()
-
-        if (!use_input_curr) { return }
-        for i = 1, $2 if ((gid = targetcomp_exists($1+i, 1)) >= 0) {
-                c = pc.gid2obj(gid)
-                c.comp[1] clmp = new Izap(0.5)
-                clmp.amp = $3
-                clmp.dur = $4
-                clmp.del = $5 + random_input.negexp(1) -1
-                clmp.f0 = $6
-                clmp.f1 = $7
-                iclamp_list.append(clmp)
-        }
-}
-
-proc set_izap_curr4() {local i, gid  localobj c, clmp, random_input
-	
-	random_input =  new Random()
-	
-	if (!use_input_curr) { return }
-	for i = 1, $2*$8 if ((gid = targetcomp_exists($1+i, 1)) >= 0) {
-		c = pc.gid2obj(gid)
-		c.comp[1] clmp = new Izap(0.5)
-		clmp.amp = $3
-		clmp.dur = $4
-		clmp.del = $5 
-		clmp.f0 = $6
-		clmp.f1 = $7
-		iclamp_list.append(clmp)
-	}
-}
-
-
+// not sure if it works - add additional electrode, only cells near the elctrode are stimulated
 proc input_electrode_curr(){
 
     if (input_electrode){
