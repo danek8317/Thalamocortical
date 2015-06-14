@@ -1,4 +1,4 @@
-
+{load_file("stimulus.hoc")}
 
 //definition of extra stimulus
 

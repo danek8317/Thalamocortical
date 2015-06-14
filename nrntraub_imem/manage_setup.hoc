@@ -42,7 +42,6 @@ if (use_load_balance) { use_traubexact = 0 } // cannot use with load balance
 {localloadfile("net/network_specification_interface.hoc")}
 if (!serial) {localloadfile("hoc/parlib2.hoc")}
 {localloadfile("net/serial_or_par_wrapper.hoc")}
-{load_file("mylib/stimulus/stimulus.hoc")}
 {localloadfile("net/groucho.hoc")}
 {load_file("mylib/stimulus/set_stimulus.hoc")}
 {load_file("mylib/init.hoc")}

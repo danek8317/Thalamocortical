@@ -98,7 +98,7 @@ strdef  spikes_dir  //if  use_vecstim = 1, spikes_dir is path to artificial spik
 spikes_dir = "/path/to/input/spikes/dir/"
 
 
-scale_TCR_output = 0   // ??????????????
+scale_TCR_output = 0   // do you want to disconnet the thalamus
 use_input_curr = 1     //do you use any additional stimulus (defined in set_stimulus.hoc)?
 
 
