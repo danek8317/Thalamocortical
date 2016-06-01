@@ -101,6 +101,7 @@ pop_names = ['pyrRS23','pyrFRB23','bask23','axax23','LTS23',
              'spinstel4', 'tuftIB5', 'tuftRS5', 'nontuftRS6', 
              'bask56', 'axax56', 'LTS56']
 h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/traub_syn.h5', 'r')
+#h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/512/12_5/all/traub.h5', 'r')
 num_x, num_y = 16, 20
 num_ele = num_x*num_y
 ele_pos = place_electrodes_2D(num_x, num_y)
@@ -111,5 +112,5 @@ fig = plt.figure()#figsize=(4,6))
 fig, ax1 = plot_morp_ele(fig, src_pos, ele_pos) 
 fig, ax2 = plot_extracellular(fig, pot, ele_pos, num_x, num_y, 1105)
 plt.tight_layout()
-plt.savefig('fig1.png', dpi=600)
+plt.savefig('fig1.png', dpi=200)
 #plt.show()

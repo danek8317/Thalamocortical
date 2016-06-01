@@ -5,8 +5,9 @@ import h5py as h5
 import brewer2mpl
 from matplotlib import rcParams, cm, gridspec
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
 
-rcParams.update({'font.size': 8})
+rcParams.update({'font.size': 8, 'font.family': 'sans-serif'})
 def fetch_mid_pts(h, pop_name):
     all_pts = h['/data/static/morphology/'+pop_name]
     x = (all_pts['x0']+all_pts['x1']) / 2.
@@ -80,9 +81,15 @@ def plot_potential(ax, lfp, max_val, title):
     plt.xticks(np.arange(3000, 5000, 1000), np.arange(300, 500, 100))
     #plt.ylabel('Electrode depth ($\mu$m)')
     #plt.xlabel('Time (ms)')
-    plt.title(title)
+    plt.title(title, fontweight="bold", fontsize=12)
     #plt.xlim(xmin=2500, xmax=4500)
     #plt.colorbar(extend='both')
+    cbaxes = inset_axes(ax,
+                        width="40%",  # width = 10% of parent_bbox width
+                        height="3%",  # height : 50%
+                        loc=1, borderpad=1 )
+    cbar = plt.colorbar(cax=cbaxes, ticks=[-max_val,0.,max_val], orientation='horizontal', format='%.2f')
+    cbar.ax.set_xticklabels([round(-max_val,2),0.,round(max_val,2)])
     return ax, im
 
 def plot_raster(h, ax, title):
@@ -127,24 +134,31 @@ def plot_raster(h, ax, title):
     plt.xlim((275, 425))
     plt.ylim((-2400 ,50))
     plt.xticks(np.arange(300, 500, 100), np.arange(300, 500, 100))
-    plt.title(title)
+    plt.title(title, fontweight="bold", fontsize=12)
     return ax
 
 def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict):
     if variable == 'AMPA+NMDA':
         pot = get_extracellular(h, pop_names, time_pts, ele_pos, 'i_AMPA')
         pot += get_extracellular(h, pop_names, time_pts, ele_pos, 'i_NMDA')
+    elif variable == 'i_cat':
+        pot = get_extracellular(h, pop_names, time_pts, ele_pos, 'i_cat')
+        pot += get_extracellular(h, pop_names, time_pts, ele_pos, 'i_cat_a')
+    elif variable == 'depol_curr':
+        
     else:
         pot = get_extracellular(h, pop_names, time_pts, ele_pos, variable)
     lfp = lowpassfilter(pot)
-    ax,im = plot_potential(ax, lfp, max_val_dict[variable], title_dict[variable])
+    lfp_max = np.max(np.abs(lfp[:, 2750:4250]))
+    #ax,im = plot_potential(ax, lfp, max_val_dict[variable], title_dict[variable])
+    ax,im = plot_potential(ax, lfp, lfp_max, title_dict[variable])
     return ax,im
 
 def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, title_dict):
-    z_steps = 4 #4 for the plots 1 for colorbar
+    z_steps = 4 #4 for the plots 
     height_ratios = [1 for i in range(z_steps)]
-    height_ratios.append(0.07) #height of colorbar
-    gs = gridspec.GridSpec(z_steps+1, 3, height_ratios=height_ratios)
+    #height_ratios.append(0.07) #height of colorbar
+    gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios)
     #Spikes
     ax = plt.subplot(gs[0, 0])
     spike_ax = plot_raster(h, ax, 'Spikes')
@@ -160,7 +174,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, titl
     ax = plt.subplot(gs[1, 0])
     variable = 'i_gaba_a'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    plt.ylabel('Electrode depth ($\mu$m)')
+    ax.set_ylabel('Electrode number')
     #I Cap
     ax = plt.subplot(gs[1, 1])
     variable = 'i_cap'
@@ -173,7 +187,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, titl
     ax = plt.subplot(gs[2, 0])
     variable = 'i_pas'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    plt.ylabel('Electrode depth ($\mu$m)')
+    ax.set_ylabel('Electrode number')
     #I Na
     ax = plt.subplot(gs[2, 2])
     variable = 'i_na'
@@ -182,24 +196,24 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, titl
     ax = plt.subplot(gs[3, 0])
     variable = 'i_cat'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    plt.ylabel('Electrode depth ($\mu$m)')
-    plt.xlabel('Time (ms)')
-    cax1 = plt.subplot(gs[4, 0])
-    cbar1 = plt.colorbar(im, cax=cax1, orientation='horizontal', extend='both')
+    ax.set_ylabel('Electrode number')
+    ax.set_xlabel('Time (ms)')
+    #cax1 = plt.subplot(gs[4, 0])
+    #cbar1 = plt.colorbar(im, cax=cax1, orientation='horizontal', extend='both')
     #I AR
     ax = plt.subplot(gs[3, 1])
     variable = 'i_ar'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    plt.xlabel('Time (ms)')
-    cax2 = plt.subplot(gs[4, 1])
-    cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
+    ax.set_xlabel('Time (ms)')
+    #cax2 = plt.subplot(gs[4, 1])
+    #cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
     #I Ca
     ax = plt.subplot(gs[3, 2])
     variable = 'i_ca'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    plt.xlabel('Time (ms)')
-    cax3 = plt.subplot(gs[4, 2])
-    cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
+    ax.set_xlabel('Time (ms)')
+    #cax3 = plt.subplot(gs[4, 2])
+    #cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
     return fig
     
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
@@ -213,11 +227,12 @@ h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/tr
 
 max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05, 
                 'i_pas':0.05, 'i_k':0.5, 'i_na':0.5, 'i_ca':0.5, 
-                'i_cat':0.05, 'i_ar':0.05, 'AMPA+NMDA':0.5}
+                'i_cat':0.05, 'i_ar':0.05, 'AMPA+NMDA':0.5, 'depol_curr':0.05}
 title_dict = {'i':'LFP', 'i_gaba_a': 'GABA A', 'i_cap':'Capacitive', 
               'i_pas':'Passive', 'i_k':'Potassium', 'i_na':'Sodium', 
-              'i_ca':'Calcium', 'i_cat':'CAT', 'i_ar':'AR', 'AMPA+NMDA':'AMPA+NMDA'}
-num_ele = 30
+              'i_ca':'Calcium', 'i_cat':'Calcium T type', 'i_ar':'Anomalous rectifier', 
+              'AMPA+NMDA':'AMPA+NMDA', 'depol_curr':'Depolarizing Current'}
+num_ele = 28
 ele_pos = place_electrodes_1D(num_ele)
 time_pts = 6000
 
@@ -231,5 +246,5 @@ time_pts = 6000
 fig = plt.figure(figsize=(12,18))
 fig = consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, title_dict)
 plt.tight_layout()
-plt.savefig('fig3.png', dpi=600)
+plt.savefig('fig3_adj_bet.png', dpi=200)
 #plt.show()

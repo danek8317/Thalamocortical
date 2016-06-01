@@ -5,8 +5,9 @@ import h5py as h5
 import brewer2mpl
 from matplotlib import rcParams, cm, gridspec
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
 
-rcParams.update({'font.size': 8})
+rcParams.update({'font.size': 8, 'font.family': 'sans-serif'})
 def fetch_mid_pts(h, pop_name):
     all_pts = h['/data/static/morphology/'+pop_name]
     x = (all_pts['x0']+all_pts['x1']) / 2.
@@ -80,9 +81,15 @@ def plot_potential(ax, lfp, max_val, title):
     plt.xticks(np.arange(3000, 5000, 1000), np.arange(300, 500, 100))
     #plt.ylabel('Electrode depth ($\mu$m)')
     #plt.xlabel('Time (ms)')
-    plt.title(title)
+    plt.title(title, fontweight="bold", fontsize=12)
     #plt.xlim(xmin=2500, xmax=4500)
     #plt.colorbar(extend='both')
+    cbaxes = inset_axes(ax,
+                        width="40%",  # width = 10% of parent_bbox width
+                        height="3%",  # height : 50%
+                        loc=1, borderpad=1)
+    cbar = plt.colorbar(cax=cbaxes, ticks=[-max_val,0.,max_val], orientation='horizontal', format='%.2f')
+    cbar.ax.set_xticklabels([round(-max_val,2),0.,round(max_val,2)])
     return ax, im
 
 def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, title):
@@ -97,14 +104,14 @@ def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, title):
 def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     z_steps = 2 #4 for the plots 1 for colorbar
     height_ratios = [1 for i in range(z_steps)]
-    height_ratios.append(0.07) #height of colorbar
-    gs = gridspec.GridSpec(z_steps+1, 3, height_ratios=height_ratios)
+    #height_ratios.append(0.07) #height of colorbar
+    gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios)
     #extracellular
     ax = plt.subplot(gs[0, 0])
     title = 'Extracellular'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
-    plt.ylabel('Electrode depth ($\mu$m)')
+    ax.set_ylabel('Electrode number')
     #LFP
     ax = plt.subplot(gs[0, 1])
     title = 'LFP'
@@ -120,26 +127,26 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     title = 'Passive soma and axon'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
-    plt.xlabel('Time (ms)')
-    plt.ylabel('Electrode depth ($\mu$m)')
-    cax = plt.subplot(gs[2, 0])
-    cbar = plt.colorbar(im, cax=cax, orientation='horizontal', extend='both')
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Electrode number')
+    #cax = plt.subplot(gs[2, 0])
+    #cbar = plt.colorbar(im, cax=cax, orientation='horizontal', extend='both')
     #passive axon
     ax = plt.subplot(gs[1, 1])
-    variable = 'Passive axon'
+    title = 'Passive axon'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
-    plt.xlabel('Time (ms)')
-    cax2 = plt.subplot(gs[2, 1])
-    cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
+    ax.set_xlabel('Time (ms)')
+    #cax2 = plt.subplot(gs[2, 1])
+    #cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
     #closed fast Na
     ax = plt.subplot(gs[1, 2])
     title = 'Closed fast Sodium'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
-    plt.xlabel('Time (ms)')
-    cax3 = plt.subplot(gs[2, 2])
-    cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
+    ax.set_xlabel('Time (ms)')
+    #cax3 = plt.subplot(gs[2, 2])
+    #cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
     return fig
 
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
@@ -169,12 +176,12 @@ max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05,
 title_dict = {'i':'LFP', 'i_gaba_a': 'GABA A', 'i_cap':'Capacitive', 
               'i_pas':'Passive', 'i_k':'Potassium', 'i_na':'Sodium', 
               'i_ca':'Calcium', 'i_cat':'CAT', 'i_ar':'AR', 'AMPA+NMDA':'AMPA+NMDA'}
-num_ele = 50
+num_ele = 28
 ele_pos = place_electrodes_1D(num_ele)
 time_pts = 6000
 fig = plt.figure(figsize=(12,9))
 fig = consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig)
 [h.close() for h in hs] #close all files memory overflow
 plt.tight_layout()
-plt.savefig('fig4.png', dpi=600)
+plt.savefig('fig4.png', dpi=200)
 #plt.show()
