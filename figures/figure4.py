@@ -93,13 +93,19 @@ def plot_potential(ax, lfp, max_val, title):
     return ax, im
 
 def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, title):
-    if title == 'Extracellular':
-        lfp = get_extracellular(h, pop_names, time_pts, ele_pos, variable) #no LOWPASS
-    else:
-        pot = get_extracellular(h, pop_names, time_pts, ele_pos, variable)
+    if title == 'LFP':
+        pot = get_extracellular(h, pop_names, time_pts, ele_pos, variable) #LOWPASS
         lfp = lowpassfilter(pot)
+    else:
+        lfp = get_extracellular(h, pop_names, time_pts, ele_pos, variable)
     ax,im = plot_potential(ax, lfp, 0.05, title)
     return ax,im
+
+def set_axis(ax, letter=None):
+    if letter is not None:
+        ax.text(0.05, 1.025, letter, fontsize=12, weight='bold', transform=ax.transAxes)
+    #ax.set_aspect('equal')
+    return ax
 
 def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     z_steps = 2 #4 for the plots 1 for colorbar
@@ -111,22 +117,26 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     title = 'Extracellular'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'A')
     ax.set_ylabel('Electrode number')
     #LFP
     ax = plt.subplot(gs[0, 1])
     title = 'LFP'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'B')
     #Only Passive
     ax = plt.subplot(gs[0, 2])
     title = 'Passive only'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'C')
     #Only Passive soma and axon
     ax = plt.subplot(gs[1, 0])
     title = 'Passive soma and axon'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'D')
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Electrode number')
     #cax = plt.subplot(gs[2, 0])
@@ -136,6 +146,7 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     title = 'Passive axon'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'E')
     ax.set_xlabel('Time (ms)')
     #cax2 = plt.subplot(gs[2, 1])
     #cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
@@ -144,6 +155,7 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     title = 'Closed fast Sodium'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    set_axis(ax, 'F')
     ax.set_xlabel('Time (ms)')
     #cax3 = plt.subplot(gs[2, 2])
     #cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
@@ -183,5 +195,5 @@ fig = plt.figure(figsize=(12,9))
 fig = consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig)
 [h.close() for h in hs] #close all files memory overflow
 plt.tight_layout()
-plt.savefig('fig4.png', dpi=200)
+plt.savefig('fig4.png', dpi=300)
 #plt.show()

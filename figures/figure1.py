@@ -1,10 +1,10 @@
 import scipy.spatial
 import numpy as np
 import h5py as h5
-from matplotlib import rcParams, cm
+from matplotlib import rcParams, cm, ticker
 import matplotlib.pyplot as plt
 
-rcParams.update({'font.size': 8})
+rcParams.update({'font.size': 8,'font.family': 'sans-serif'})
 
 def place_electrodes_2D(nx, ny):
     '''place nx*ny electrodes next to the column - like an MEA'''
@@ -69,27 +69,35 @@ def get_extracellular(h, pop_names, time_pts, ele_pos):
 
 def plot_morp_ele(fig, src_pos, ele_pos):
     ax1 = plt.subplot(121, aspect='equal')
-    plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.6, color='k', lw = 1., s=0.2)
-    plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.5, color='r', lw = 1., s=0.4)
+    plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.7, color='k', s=0.6)
+    plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.8, color='r', s=0.9)
     plt.xlabel('X ($\mu$m)')
     plt.ylabel('Y ($\mu$m)')
     plt.title('Morphology and electrodes')
-    plt.ylim(ymin=-2400,ymax=550)
+    plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
-    plt.text(0., 0., 'A', ha='left', va='top', size=5, alpha=1.)
     return fig, ax1
 
 def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
     ax2 = plt.subplot(122, aspect='equal')
+    lfp *= 1000.
     lfp_max = np.max(np.abs(lfp[:, time_pt]))
     levels = np.linspace(-lfp_max, lfp_max, 16)
     im2 = plt.contourf(ele_pos[:,0].reshape(num_x, num_y), 
                        ele_pos[:,1].reshape(num_x, num_y), 
                        lfp[:,time_pt].reshape(num_x,num_y), 
                        levels=levels, cmap=plt.cm.PRGn)
-    plt.colorbar(im2, extend='both')
+    cb = plt.colorbar(im2, extend='both')
+    tick_locator = ticker.MaxNLocator(nbins=9, trim=False, prune=None)
+    #tick_locator.bin_boundaries(-lfp_max, lfp_max)
+    cb.locator = tick_locator
+    #cb.ax.yaxis.set_major_locator(ticker.AutoLocator())
+    cb.update_ticks()
+    cb.ax.set_title('$\mu$V')
     plt.title('Time='+str(time_pt/10.)+' ms')
-    plt.ylim(ymin=-2400,ymax=550)
+    plt.xlabel('X ($\mu$m)')
+    plt.ylabel('Y ($\mu$m)')
+    plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
     return fig, ax2
 
@@ -112,5 +120,5 @@ fig = plt.figure()#figsize=(4,6))
 fig, ax1 = plot_morp_ele(fig, src_pos, ele_pos) 
 fig, ax2 = plot_extracellular(fig, pot, ele_pos, num_x, num_y, 1105)
 plt.tight_layout()
-plt.savefig('fig1.png', dpi=200)
+plt.savefig('fig1.png', dpi=300)
 #plt.show()

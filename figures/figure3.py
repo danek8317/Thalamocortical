@@ -38,12 +38,14 @@ def inv_distance(src_pos, ele_pos):
     dist_matrix = 1 / dist_matrix #inverse distance matrix
     return dist_matrix
 
-def pot_vs_time(h, pop_name, field_name, src_pos, ele_pos):
+def pot_vs_time(h, pop_name, field_names, src_pos, ele_pos):
     '''returns potentials, at ele_pos, due to src_pos, over time'''
-    idx = find_map_idx(h, pop_name, field_name)
-    src_time = h['/data/uniform/'+pop_name+'/'+field_name].value
-    src_time = src_time[idx] # Order according to correct indices
     ele_src = inv_distance(src_pos, ele_pos).T
+    src_time = np.zeros((src_pos.shape[0], 6000))
+    for field_name in field_names:
+        idx = find_map_idx(h, pop_name, field_name)
+        this_field = h['/data/uniform/'+pop_name+'/'+field_name].value
+        src_time += this_field[idx] # Order according to correct indices
     return np.dot(ele_src, src_time)*(1 / (4*np.pi*0.3))
 
 def get_all_src_pos(h, pop_names, total_cmpts):
@@ -52,12 +54,12 @@ def get_all_src_pos(h, pop_names, total_cmpts):
         all_srcs[np.sum(total_cmpts[:jj]):np.sum(total_cmpts[:jj+1]), :] = fetch_mid_pts(h, pop_name)
     return all_srcs
 
-def get_extracellular(h, pop_names, time_pts, ele_pos, variable):
+def get_extracellular(h, pop_names, time_pts, ele_pos, variables):
     pot_sum = np.zeros((num_ele, time_pts))
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
-        pot_sum += pot_vs_time(h, pop_name, variable, src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name, using currents', pop_name, variable
+        pot_sum += pot_vs_time(h, pop_name, variables, src_pos, ele_pos)
+        print 'Done extracellular pots for pop_name, using currents', pop_name, variables
     return pot_sum
 
 def place_electrodes_1D(n):
@@ -137,24 +139,25 @@ def plot_raster(h, ax, title):
     plt.title(title, fontweight="bold", fontsize=12)
     return ax
 
-def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict):
-    if variable == 'AMPA+NMDA':
-        pot = get_extracellular(h, pop_names, time_pts, ele_pos, 'i_AMPA')
-        pot += get_extracellular(h, pop_names, time_pts, ele_pos, 'i_NMDA')
-    elif variable == 'i_cat':
-        pot = get_extracellular(h, pop_names, time_pts, ele_pos, 'i_cat')
-        pot += get_extracellular(h, pop_names, time_pts, ele_pos, 'i_cat_a')
-    elif variable == 'depol_curr':
-        
+def get_specific(ax, h, pop_names, time_pts, ele_pos, variables, title):
+    if title == 'Other':
+        pot_all_but = get_extracellular(h, pop_names, time_pts, ele_pos, variables)
+        pot_all = get_extracellular(h, pop_names, time_pts, ele_pos, ['i'])
+        pot = pot_all - pot_all_but
     else:
-        pot = get_extracellular(h, pop_names, time_pts, ele_pos, variable)
+        pot = get_extracellular(h, pop_names, time_pts, ele_pos, variables)
     lfp = lowpassfilter(pot)
     lfp_max = np.max(np.abs(lfp[:, 2750:4250]))
-    #ax,im = plot_potential(ax, lfp, max_val_dict[variable], title_dict[variable])
-    ax,im = plot_potential(ax, lfp, lfp_max, title_dict[variable])
+    ax,im = plot_potential(ax, lfp, lfp_max, title)
     return ax,im
 
-def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, title_dict):
+def set_axis(ax, letter=None):
+    if letter is not None:
+        ax.text(0.05, 1.025, letter, fontsize=12, weight='bold', transform=ax.transAxes)
+    #ax.set_aspect('equal')
+    return ax
+
+def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     z_steps = 4 #4 for the plots 
     height_ratios = [1 for i in range(z_steps)]
     #height_ratios.append(0.07) #height of colorbar
@@ -162,58 +165,68 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, titl
     #Spikes
     ax = plt.subplot(gs[0, 0])
     spike_ax = plot_raster(h, ax, 'Spikes')
-    #LFP
+    set_axis(ax, letter='A')
+    ##LFP
     ax = plt.subplot(gs[0, 1])
-    variable = 'i'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
-    #AMPA + NMDA
+    key_val = 'LFP'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='B')
+    # #AMPA + NMDA
     ax = plt.subplot(gs[0, 2])
-    variable = 'AMPA+NMDA'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'AMPA+NMDA'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='C')
     #GABA A
     ax = plt.subplot(gs[1, 0])
-    variable = 'i_gaba_a'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'GABA A'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='D')
     ax.set_ylabel('Electrode number')
     #I Cap
     ax = plt.subplot(gs[1, 1])
-    variable = 'i_cap'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Capacitive'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='E')
     #I K
     ax = plt.subplot(gs[1, 2])
-    variable = 'i_k'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Potassium'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='F')
     #I Pas
     ax = plt.subplot(gs[2, 0])
-    variable = 'i_pas'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Passive'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='G')
     ax.set_ylabel('Electrode number')
+    #I Ca
+    ax = plt.subplot(gs[2,1])
+    key_val = 'Calcium'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='H')
     #I Na
     ax = plt.subplot(gs[2, 2])
-    variable = 'i_na'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Sodium'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='I')
     #I Cat
     ax = plt.subplot(gs[3, 0])
-    variable = 'i_cat'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Calcium T type'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='J')
     ax.set_ylabel('Electrode number')
     ax.set_xlabel('Time (ms)')
-    #cax1 = plt.subplot(gs[4, 0])
-    #cbar1 = plt.colorbar(im, cax=cax1, orientation='horizontal', extend='both')
     #I AR
     ax = plt.subplot(gs[3, 1])
-    variable = 'i_ar'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Anomalous rectifier'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='K')
     ax.set_xlabel('Time (ms)')
-    #cax2 = plt.subplot(gs[4, 1])
-    #cbar2 = plt.colorbar(im, cax=cax2, orientation='horizontal', extend='both')
-    #I Ca
+    #Depolarizing + ectopic
     ax = plt.subplot(gs[3, 2])
-    variable = 'i_ca'
-    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable, max_val_dict, title_dict)
+    key_val = 'Other'
+    ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    set_axis(ax, letter='L')
     ax.set_xlabel('Time (ms)')
-    #cax3 = plt.subplot(gs[4, 2])
-    #cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
     return fig
     
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
@@ -225,13 +238,23 @@ pop_names = ['pyrRS23','pyrFRB23','bask23','axax23','LTS23',
              'bask56', 'axax56', 'LTS56']
 h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/traub_syn.h5', 'r')
 
-max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05, 
-                'i_pas':0.05, 'i_k':0.5, 'i_na':0.5, 'i_ca':0.5, 
-                'i_cat':0.05, 'i_ar':0.05, 'AMPA+NMDA':0.5, 'depol_curr':0.05}
-title_dict = {'i':'LFP', 'i_gaba_a': 'GABA A', 'i_cap':'Capacitive', 
-              'i_pas':'Passive', 'i_k':'Potassium', 'i_na':'Sodium', 
-              'i_ca':'Calcium', 'i_cat':'Calcium T type', 'i_ar':'Anomalous rectifier', 
-              'AMPA+NMDA':'AMPA+NMDA', 'depol_curr':'Depolarizing Current'}
+# #IGNORED MAX_VAL_DICT
+# max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05, 
+#                 'i_pas':0.05, 'i_k':0.5, 'i_na':0.5, 'i_ca':0.5, 
+#                 'i_cat':0.05, 'i_ar':0.05, 'AMPA+NMDA':0.5, 'depol_curr':0.05}
+
+# title_dict = {'i':'LFP', 'i_gaba_a': 'GABA A', 'i_cap':'Capacitive', 
+#               'i_pas':'Passive', 'i_k':'Potassium', 'i_na':'Sodium', 
+#               'i_ca':'Calcium', 'i_cat':'Calcium T type', 'i_ar':'Anomalous rectifier', 
+#               'AMPA+NMDA':'AMPA+NMDA', 'depol_curr':'Depolarizing Current'}
+
+variable_dict = {'LFP':['i'], 'AMPA+NMDA':['i_AMPA', 'i_NMDA'], 'GABA A':['i_gaba_a'],
+                 'Capacitive':['i_cap'], 'Potassium':['i_k'], 'Passive':['i_pas'],
+                 'Sodium':['i_na'], 'Calcium T type':['i_cat', 'i_cat_a'], 
+                 'Anomalous rectifier':['i_ar'], 'Calcium':['i_ca'], 
+                 'Other':['i_AMPA', 'i_NMDA', 'i_gaba_a', 'i_cap', 'i_k', 'i_pas', 'i_na', 'i_cat', 'i_cat_a', 'i_ar', 'i_ca']
+                 }
+
 num_ele = 28
 ele_pos = place_electrodes_1D(num_ele)
 time_pts = 6000
@@ -244,7 +267,7 @@ time_pts = 6000
 #ax1 = plot_raster(h, ax, 'Spikes')
 
 fig = plt.figure(figsize=(12,18))
-fig = consolidated_figure(h, pop_names, ele_pos, time_pts, fig, max_val_dict, title_dict)
+fig = consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict)
 plt.tight_layout()
-plt.savefig('fig3_adj_bet.png', dpi=200)
+plt.savefig('fig3.png', dpi=300)
 #plt.show()
