@@ -1,4 +1,4 @@
-{load_file("stimulus.hoc")}
+
 
 //definition of extra stimulus
 
@@ -11,8 +11,8 @@
 //
 //e.g
 //j = 0  //populations get numbers from 0 (0 is suppyrRS)
-//set_input_curr(suppyrRS_base, Num_pop.x(j), 2,3,100) - will stimulate the whole poulation
-//set_input_curr(suppyrRS_base, 1, 2, 3, 100) - will stimulate one cell 
+//set_input_curr(suppyrRS_base, Num_pop.x(j), 2,3,100)
+//
 
 
 

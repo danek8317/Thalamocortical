@@ -1,4 +1,4 @@
-//should be load in manage_setup.hoc
+
 strdef dir //path to data dir
 dir = "/home/hglabska/data2/artykul_data/git/Thalamocortical_imem/data/"
 
@@ -34,7 +34,7 @@ Map_names[13] = new String("nRT")
 
 ///////////////////////////////////////////////////////////// params for saving_data.hoc
 
-n_currents = 12 //how many single currents you want to truck
+n_currents = 0 //how many single currents you want to truck
 n_not_ionic_curr = 8  // how many not ionic currents you want to truck (does't matter if n_currents = 0 )
 
 strdef  add_curr_params_path //path to the file where single currents are described
@@ -67,7 +67,7 @@ save_deepLTS = 0
 save_TCR = 0
 ave_nRT = 0
 
-next_ = 15   // some technical parameter, time interval in ms - how you want to save data (it can be to big because
+next_ = 1   // some technical parameter, time interval in ms - how you want to save data (it can be to big because
              // the data can be to large to fit memory size, that also shouldn't be to small mainly on architectures like bluegene where
 			 // only few nodes is dedicated to i/o operations.
 
@@ -98,9 +98,8 @@ strdef  spikes_dir  //if  use_vecstim = 1, spikes_dir is path to artificial spik
 spikes_dir = "/path/to/input/spikes/dir/"
 
 
-scale_TCR_output = 0   // do you want to disconnet the thalamus
-use_input_curr = 1     //do you use any additional stimulus (defined in set_stimulus.hoc)?
-
+scale_TCR_output = 0   // ??????????????
+use_input_curr = 1  //??
 
 active_ions = 0   // ! not intuitive parmeter, set active_ions =1 if you want to CLOSE ! all active chanels
 passive_axon = 0  // 1 purely passive passive_axon // 0 normal case
