@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 rcParams.update({'font.size': 8,'font.family': 'sans-serif'})
 
 def place_electrodes_2D(nx, ny):
-    '''place nx*ny electrodes next to the column - like an MEA'''
+    """place nx*ny electrodes next to the column - like an MEA"""
     tot_ele = nx*ny
     zz = np.ones((tot_ele,1))*-25.
     xx, yy = np.mgrid[-375:375:np.complex(0,nx), -2050:450:np.complex(0,ny)]
@@ -16,6 +16,7 @@ def place_electrodes_2D(nx, ny):
     return np.hstack((xx, yy, zz))
 
 def fetch_mid_pts(h, pop_name):
+    """gets the mid points from a file, of a particular population name"""
     all_pts = h['/data/static/morphology/'+pop_name]
     x = (all_pts['x0']+all_pts['x1']) / 2.
     y = (all_pts['y0']+all_pts['y1']) / 2.
@@ -26,7 +27,7 @@ def fetch_mid_pts(h, pop_name):
     return np.hstack((x, y, z))
 
 def find_map_idx(h, pop_name, field_name):
-    '''Find the corresponding, locations of morphology in field'''
+    """Find the corresponding, locations of morphology in field"""
     mor = h['/data/static/morphology/'+pop_name]
     i_data = h['/data/uniform/'+pop_name+'/'+field_name]
     mor_names = mor.dims[0].values()[0] #entry in /map
@@ -38,7 +39,7 @@ def find_map_idx(h, pop_name, field_name):
     return idx
 
 def inv_distance(src_pos, ele_pos):
-    '''computes the inverse distance between src_pos and ele_pos'''
+    """computes the inverse distance between src_pos and ele_pos"""
     dist_matrix = np.zeros((src_pos.shape[0], ele_pos.shape[0]))
     for ii,electrode in enumerate(ele_pos):
         dist_matrix[:, ii] = scipy.spatial.distance.cdist(src_pos, electrode.reshape(1,3)).flatten()
@@ -46,7 +47,7 @@ def inv_distance(src_pos, ele_pos):
     return dist_matrix
 
 def pot_vs_time(h, pop_name, field_name, src_pos, ele_pos):
-    '''returns potentials, at ele_pos, due to src_pos, over time'''
+    """returns potentials, at ele_pos, due to src_pos, over time"""
     idx = find_map_idx(h, pop_name, field_name)
     src_time = h['/data/uniform/'+pop_name+'/'+field_name].value
     src_time = src_time[idx] # Order according to correct indices
@@ -54,12 +55,14 @@ def pot_vs_time(h, pop_name, field_name, src_pos, ele_pos):
     return np.dot(ele_src, src_time)*(1 / (4*np.pi*0.3))
 
 def get_all_src_pos(h, pop_names, total_cmpts):
+    """Function to compute the positions for a list of populations"""
     all_srcs = np.zeros((sum(total_cmpts), 3))
     for jj, pop_name in enumerate(pop_names):
         all_srcs[np.sum(total_cmpts[:jj]):np.sum(total_cmpts[:jj+1]), :] = fetch_mid_pts(h, pop_name)
     return all_srcs
 
 def get_extracellular(h, pop_names, time_pts, ele_pos):
+    """Fuction to obtain the extracellular potentails at some time points and electrode positions"""
     pot_sum = np.zeros((num_ele, time_pts))
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
@@ -68,6 +71,7 @@ def get_extracellular(h, pop_names, time_pts, ele_pos):
     return pot_sum
 
 def plot_morp_ele(fig, src_pos, ele_pos):
+    """Plots the morphology midpoints and the electrode positions""" 
     ax1 = plt.subplot(121, aspect='equal')
     plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.7, color='k', s=0.6)
     plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.8, color='r', s=0.9)
@@ -79,6 +83,7 @@ def plot_morp_ele(fig, src_pos, ele_pos):
     return fig, ax1
 
 def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
+    """Plots the extracellular potentials at a given potentials"""
     ax2 = plt.subplot(122, aspect='equal')
     lfp *= 1000.
     lfp_max = np.max(np.abs(lfp[:, time_pt]))
