@@ -84,12 +84,16 @@ def plot_potential(ax, lfp, max_val, title):
     plt.title(title, fontweight="bold", fontsize=12)
     #plt.xlim(xmin=2500, xmax=4500)
     #plt.colorbar(extend='both')
+    plt.gca().set_yticks(np.arange(28))
+    plt.gca().set_yticklabels(np.arange(1,29))
+    for label in plt.gca().yaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
     cbaxes = inset_axes(ax,
                         width="40%",  # width = 10% of parent_bbox width
                         height="3%",  # height : 50%
                         loc=1, borderpad=1)
     cbar = plt.colorbar(cax=cbaxes, ticks=[-max_val,0.,max_val], orientation='horizontal', format='%.2f')
-    cbar.ax.set_xticklabels([round(-max_val,2),0.,round(max_val,2)])
+    cbar.ax.set_xticklabels([round(-max_val,2),str('0 $\mu V$'),round(max_val,2)])
     return ax, im
 
 def get_specific(ax, h, pop_names, time_pts, ele_pos, variable, title):
@@ -106,6 +110,17 @@ def set_axis(ax, letter=None):
         ax.text(0.05, 1.025, letter, fontsize=12, weight='bold', transform=ax.transAxes)
     #ax.set_aspect('equal')
     return ax
+
+def add_second_yaxis(ax):
+    #ax.autoscale(False)
+    ax2 = ax.twinx()
+    ax2.set_ylabel("Electrode position (mm)")
+    ele_pos = place_electrodes_1D(28)
+    ax2.set_yticks(np.arange(28))
+    ax2.set_yticklabels(np.round(ele_pos[:,1]/1000.,2))
+    for label in ax2.yaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
+    return
 
 def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     z_steps = 2 #4 for the plots 1 for colorbar
@@ -130,6 +145,7 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     title = 'Passive only'
     h = h_dict[title]
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
+    add_second_yaxis(ax)
     set_axis(ax, 'C')
     #Only Passive soma and axon
     ax = plt.subplot(gs[1, 0])
@@ -157,6 +173,7 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, 'i',  title)
     set_axis(ax, 'F')
     ax.set_xlabel('Time (ms)')
+    add_second_yaxis(ax)
     #cax3 = plt.subplot(gs[2, 2])
     #cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal', extend='both')
     return fig
@@ -195,5 +212,5 @@ fig = plt.figure(figsize=(12,9))
 fig = consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig)
 [h.close() for h in hs] #close all files memory overflow
 plt.tight_layout()
-plt.savefig('fig4.png', dpi=300)
+plt.savefig('fig4.png', dpi=600)
 #plt.show()

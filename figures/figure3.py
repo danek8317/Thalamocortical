@@ -84,6 +84,11 @@ def plot_potential(ax, lfp, max_val, title):
     #plt.ylabel('Electrode depth ($\mu$m)')
     #plt.xlabel('Time (ms)')
     plt.title(title, fontweight="bold", fontsize=12)
+    #plt.yticks(np.arange(28))
+    plt.gca().set_yticks(np.arange(28))
+    plt.gca().set_yticklabels(np.arange(1,29))
+    for label in plt.gca().yaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
     #plt.xlim(xmin=2500, xmax=4500)
     #plt.colorbar(extend='both')
     cbaxes = inset_axes(ax,
@@ -91,7 +96,7 @@ def plot_potential(ax, lfp, max_val, title):
                         height="3%",  # height : 50%
                         loc=1, borderpad=1 )
     cbar = plt.colorbar(cax=cbaxes, ticks=[-max_val,0.,max_val], orientation='horizontal', format='%.2f')
-    cbar.ax.set_xticklabels([round(-max_val,2),0.,round(max_val,2)])
+    cbar.ax.set_xticklabels([round(-max_val,2),str('0 $\mu V$'),round(max_val,2)])
     return ax, im
 
 def plot_raster(h, ax, title):
@@ -157,6 +162,17 @@ def set_axis(ax, letter=None):
     #ax.set_aspect('equal')
     return ax
 
+def add_second_yaxis(ax):
+    #ax.autoscale(False)
+    ax2 = ax.twinx()
+    ax2.set_ylabel("Electrode position (mm)")
+    ele_pos = place_electrodes_1D(28)
+    ax2.set_yticks(np.arange(28))
+    ax2.set_yticklabels(np.round(ele_pos[:,1]/1000.,2))
+    for label in ax2.yaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
+    return
+
 def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     z_steps = 4 #4 for the plots 
     height_ratios = [1 for i in range(z_steps)]
@@ -175,6 +191,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     ax = plt.subplot(gs[0, 2])
     key_val = 'AMPA+NMDA'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    add_second_yaxis(ax)
     set_axis(ax, letter='C')
     #GABA A
     ax = plt.subplot(gs[1, 0])
@@ -191,7 +208,9 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     ax = plt.subplot(gs[1, 2])
     key_val = 'Potassium'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+
     set_axis(ax, letter='F')
+    add_second_yaxis(ax)
     #I Pas
     ax = plt.subplot(gs[2, 0])
     key_val = 'Passive'
@@ -207,6 +226,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     ax = plt.subplot(gs[2, 2])
     key_val = 'Sodium'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    add_second_yaxis(ax)
     set_axis(ax, letter='I')
     #I Cat
     ax = plt.subplot(gs[3, 0])
@@ -225,6 +245,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     ax = plt.subplot(gs[3, 2])
     key_val = 'Other'
     ax, im = get_specific(ax, h, pop_names, time_pts, ele_pos, variable_dict[key_val], key_val)
+    add_second_yaxis(ax)
     set_axis(ax, letter='L')
     ax.set_xlabel('Time (ms)')
     return fig
@@ -269,5 +290,5 @@ time_pts = 6000
 fig = plt.figure(figsize=(12,18))
 fig = consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict)
 plt.tight_layout()
-plt.savefig('fig3.png', dpi=300)
+plt.savefig('fig3.png', dpi=600)
 #plt.show()

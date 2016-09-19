@@ -3,6 +3,8 @@ import numpy as np
 import h5py as h5
 from matplotlib import rcParams, cm, ticker
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
+from KCSD2D import KCSD2D
 
 rcParams.update({'font.size': 8,'font.family': 'sans-serif'})
 
@@ -70,16 +72,51 @@ def get_extracellular(h, pop_names, time_pts, ele_pos):
         print 'Done extracellular pots for pop_name', pop_name
     return pot_sum
 
-def plot_morp_ele(fig, src_pos, ele_pos):
+def plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt):
     """Plots the morphology midpoints and the electrode positions""" 
     ax1 = plt.subplot(121, aspect='equal')
     plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.7, color='k', s=0.6)
     plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.8, color='r', s=0.9)
+    # for tx in range(len(ele_pos[:,0])):
+        # plt.text(ele_pos[tx, 0], ele_pos[tx, 1], str(tx))
+    ele_1 = 154
+    ele_2 = 146
+    plt.scatter(ele_pos[ele_1, 0], ele_pos[ele_1, 1], marker='s', color='r', s=14.)
+    plt.scatter(ele_pos[ele_2, 0], ele_pos[ele_2, 1], marker='s', color='b', s=14.)
     plt.xlabel('X ($\mu$m)')
     plt.ylabel('Y ($\mu$m)')
     plt.title('Morphology and electrodes')
     plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
+
+    cbaxes = inset_axes(ax1,
+                        width="50%",  # width = 10% of parent_bbox width
+                        height="17%",  # height : 50%
+                        loc=4, borderpad=2.)
+    
+    plt.plot(np.arange(6000), pot[ele_1, :], color='r')
+    plt.plot(np.arange(6000), pot[ele_2, :], color='b')
+
+    dummy_line = np.arange(-0.5, 0.5, 0.1)
+    plt.plot(np.zeros_like(dummy_line)+time_pt, dummy_line, color='black', linewidth=2) 
+
+    # ax=plt.gca()
+    # ax.arrow(time_pt, -0.1, 0., 0.075, head_width=0.05,
+    #          head_length=0.05, width=0.1,
+    #          length_includes_head=True, fc='k', ec='k')
+    plt.xlim((2750, 4250))
+    plt.xticks(np.arange(3000, 5000, 1000), np.arange(300, 500, 100))
+    plt.ylim((-0.2, 0.1))
+    plt.yticks(np.arange(-0.2, 0.1, 0.1),np.arange(-0.2, 0.1, 0.1))
+    ax = plt.gca()
+    ax.get_yaxis().tick_right()#set_tick_params(direction='in')
+    # plt.xlabel('time (ms)')
+    # plt.ylabel('potential ($\mu V$)')
+
+    # inset_plt = plt.plot(cax=cbaxes, 
+    # cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
+    # cbar.ax.set_xticklabels([round(-lfp_max,2),str('0 $\mu V$'),round(lfp_max,2)])
+
     return fig, ax1
 
 def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
@@ -92,20 +129,57 @@ def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
                        ele_pos[:,1].reshape(num_x, num_y), 
                        lfp[:,time_pt].reshape(num_x,num_y), 
                        levels=levels, cmap=plt.cm.PRGn)
-    cb = plt.colorbar(im2, extend='both')
-    tick_locator = ticker.MaxNLocator(nbins=9, trim=False, prune=None)
-    #tick_locator.bin_boundaries(-lfp_max, lfp_max)
-    cb.locator = tick_locator
-    #cb.ax.yaxis.set_major_locator(ticker.AutoLocator())
-    cb.update_ticks()
-    cb.ax.set_title('$\mu$V')
+
+
+    # cb = plt.colorbar(im2, extend='both')
+    # tick_locator = ticker.MaxNLocator(nbins=9, trim=False, prune=None)
+    # #tick_locator.bin_boundaries(-lfp_max, lfp_max)
+    # cb.locator = tick_locator
+    # #cb.ax.yaxis.set_major_locator(ticker.AutoLocator())
+    # cb.update_ticks()
+    # cb.ax.set_title('$\mu$V')
+
     plt.title('Time='+str(time_pt/10.)+' ms')
     plt.xlabel('X ($\mu$m)')
     plt.ylabel('Y ($\mu$m)')
     plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
+    cbaxes = inset_axes(ax2,
+                        width="50%",  # width = 10% of parent_bbox width
+                        height="2%",  # height : 50%
+                        loc=1, borderpad=1)
+    cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
+    cbar.ax.set_xticklabels([round(-lfp_max,2),str('0 $\mu V$'),round(lfp_max,2)])
     return fig, ax2
 
+def plot_csd(fig, ele_pos, lfp, time_pt):
+    xx, yy, zz = ele_pos.T
+    ele_pos = np.vstack((xx,yy)).T
+    ax3 = plt.subplot(133, aspect='equal')
+    pot = lfp[:, time_pt].reshape(320,1)
+    k = KCSD2D(ele_pos, pot, h=25.,
+               src_type='gauss', R_init=0.23)
+    k.cross_validate()
+    est_csd = k.values('CSD')
+    k.estm_x, k.estm_y, est_csd
+    t_max = np.max(np.abs(est_csd[:,:,0]))
+    levels_kcsd = np.linspace(-1*t_max, t_max, 16)
+    im3 = ax3.contourf(k.estm_x, k.estm_y, est_csd[:,:,0],
+                       levels=levels_kcsd, cmap=cm.bwr_r)
+    plt.title('Time='+str(time_pt/10.)+' ms')
+    plt.xlabel('X ($\mu$m)')
+    plt.ylabel('Y ($\mu$m)')
+    plt.ylim(ymin=-2150,ymax=550)
+    plt.xlim(xmin=-450,xmax=450)
+    cbaxes = inset_axes(ax3,
+                        width="50%",  # width = 10% of parent_bbox width
+                        height="2%",  # height : 50%
+                        loc=1, borderpad=1)
+    cbar = plt.colorbar(cax=cbaxes, ticks=[-t_max,0.,t_max], orientation='horizontal', format='%.2f')
+    cbar.ax.set_xticklabels([round(-t_max,2),str('0 $\mu A/mm^3$'),round(t_max,2)])
+    return fig, ax3
+
+time_pt_interest = 3010
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
 cell_range = [0,1000,1050,1140,1230,1320,1560,2360,2560,3060,3160,3260,3360]
 num_cells = np.diff(cell_range) / 10 #10% MODEL
@@ -118,12 +192,15 @@ h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/tr
 num_x, num_y = 16, 20
 num_ele = num_x*num_y
 ele_pos = place_electrodes_2D(num_x, num_y)
+
 time_pts = 6000
 pot = get_extracellular(h, pop_names, time_pts, ele_pos)
 src_pos = get_all_src_pos(h, pop_names, total_cmpts)
 fig = plt.figure()#figsize=(4,6))
-fig, ax1 = plot_morp_ele(fig, src_pos, ele_pos) 
-fig, ax2 = plot_extracellular(fig, pot, ele_pos, num_x, num_y, 1105)
+fig, ax1 = plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt_interest) 
+fig, ax2 = plot_extracellular(fig, pot, ele_pos, num_x, num_y, time_pt_interest)
+
+#fig, ax3 = plot_csd(fig, ele_pos, pot, time_pt_interest)
 plt.tight_layout()
-plt.savefig('fig1.png', dpi=300)
+plt.savefig('fig1.png', dpi=600)
 #plt.show()
