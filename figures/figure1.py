@@ -1,7 +1,7 @@
 import scipy.spatial
 import numpy as np
 import h5py as h5
-from matplotlib import rcParams, cm, ticker
+from matplotlib import rcParams, cm, ticker, gridspec
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 from KCSD2D import KCSD2D
@@ -72,9 +72,9 @@ def get_extracellular(h, pop_names, time_pts, ele_pos):
         print 'Done extracellular pots for pop_name', pop_name
     return pot_sum
 
-def plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt):
+def plot_morp_ele(ax1, src_pos, ele_pos, pot, time_pt):
     """Plots the morphology midpoints and the electrode positions""" 
-    ax1 = plt.subplot(121, aspect='equal')
+    ax = plt.subplot(121, aspect='equal')
     plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.7, color='k', s=0.6)
     plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.8, color='r', s=0.9)
     # for tx in range(len(ele_pos[:,0])):
@@ -89,7 +89,7 @@ def plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt):
     plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
 
-    cbaxes = inset_axes(ax1,
+    cbaxes = inset_axes(ax,
                         width="50%",  # width = 10% of parent_bbox width
                         height="17%",  # height : 50%
                         loc=4, borderpad=2.)
@@ -117,11 +117,11 @@ def plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt):
     # cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
     # cbar.ax.set_xticklabels([round(-lfp_max,2),str('0 $\mu V$'),round(lfp_max,2)])
 
-    return fig, ax1
+    return ax1
 
-def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
+def plot_extracellular(ax4, lfp, ele_pos, num_x, num_y, time_pt):
     """Plots the extracellular potentials at a given potentials"""
-    ax2 = plt.subplot(122, aspect='equal')
+    ax = plt.subplot(122, aspect='equal')
     lfp *= 1000.
     lfp_max = np.max(np.abs(lfp[:, time_pt]))
     levels = np.linspace(-lfp_max, lfp_max, 16)
@@ -144,40 +144,14 @@ def plot_extracellular(fig, lfp, ele_pos, num_x, num_y, time_pt):
     plt.ylabel('Y ($\mu$m)')
     plt.ylim(ymin=-2150,ymax=550)
     plt.xlim(xmin=-450,xmax=450)
-    cbaxes = inset_axes(ax2,
+    cbaxes = inset_axes(ax,
                         width="50%",  # width = 10% of parent_bbox width
                         height="2%",  # height : 50%
                         loc=1, borderpad=1)
     cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
     cbar.ax.set_xticklabels([round(-lfp_max,2),str('0 $\mu V$'),round(lfp_max,2)])
-    return fig, ax2
+    return ax4
 
-def plot_csd(fig, ele_pos, lfp, time_pt):
-    xx, yy, zz = ele_pos.T
-    ele_pos = np.vstack((xx,yy)).T
-    ax3 = plt.subplot(133, aspect='equal')
-    pot = lfp[:, time_pt].reshape(320,1)
-    k = KCSD2D(ele_pos, pot, h=25.,
-               src_type='gauss', R_init=0.23)
-    k.cross_validate()
-    est_csd = k.values('CSD')
-    k.estm_x, k.estm_y, est_csd
-    t_max = np.max(np.abs(est_csd[:,:,0]))
-    levels_kcsd = np.linspace(-1*t_max, t_max, 16)
-    im3 = ax3.contourf(k.estm_x, k.estm_y, est_csd[:,:,0],
-                       levels=levels_kcsd, cmap=cm.bwr_r)
-    plt.title('Time='+str(time_pt/10.)+' ms')
-    plt.xlabel('X ($\mu$m)')
-    plt.ylabel('Y ($\mu$m)')
-    plt.ylim(ymin=-2150,ymax=550)
-    plt.xlim(xmin=-450,xmax=450)
-    cbaxes = inset_axes(ax3,
-                        width="50%",  # width = 10% of parent_bbox width
-                        height="2%",  # height : 50%
-                        loc=1, borderpad=1)
-    cbar = plt.colorbar(cax=cbaxes, ticks=[-t_max,0.,t_max], orientation='horizontal', format='%.2f')
-    cbar.ax.set_xticklabels([round(-t_max,2),str('0 $\mu A/mm^3$'),round(t_max,2)])
-    return fig, ax3
 
 time_pt_interest = 3010
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
@@ -197,10 +171,14 @@ time_pts = 6000
 pot = get_extracellular(h, pop_names, time_pts, ele_pos)
 src_pos = get_all_src_pos(h, pop_names, total_cmpts)
 fig = plt.figure()#figsize=(4,6))
-fig, ax1 = plot_morp_ele(fig, src_pos, ele_pos, pot, time_pt_interest) 
-fig, ax2 = plot_extracellular(fig, pot, ele_pos, num_x, num_y, time_pt_interest)
+gs = gridspec.GridSpec(2, 2, height_ratios=[1,1])
+ax1 = plt.subplot(gs[:, 0])
+ax1 = plot_morp_ele(ax1, src_pos, ele_pos, pot, time_pt_interest) 
+
+ax4 = plt.subplot(gs[:, -1])
+ax4 = plot_extracellular(ax4, pot, ele_pos, num_x, num_y, time_pt_interest)
 
 #fig, ax3 = plot_csd(fig, ele_pos, pot, time_pt_interest)
 plt.tight_layout()
-plt.savefig('fig1.png', dpi=600)
-#plt.show()
+#plt.savefig('fig1.png', dpi=600)
+plt.show()
