@@ -246,7 +246,7 @@ execute procedures defined in stimulus
 
 3. To run the simulation
 
-   >mpirun -np n_cores i686/special -mpi init.hoc 
+   mpirun -np n_cores i686/special -mpi init.hoc 
    (depending on an architecture there can be x86_64/special or powerpc/special e.t.c)
 
    To calculate 3d positions:
@@ -261,7 +261,6 @@ write time , cell, segment e.t.c)
 ===================== Convert to NSDF =====================
 
 See folder convert_nsdf
-
 
 Step 1: sh reformat.sh
 
@@ -301,86 +300,90 @@ After this a sane valid NSDF file is born
 
 ================ Analysis scripts ================ 
 
-These scripts are specific for these simulations, although can be
-extended to generic NSDF files.
+See folder analysis_scripts
+
+These python scripts are specific for these simulations, although can
+be extended to generic NSDF files.
 
 
-1. lfp_parameters.py
+1.  lfp_parameters.py
 
-Has the option of selecting 1D, 2D or 3D electrodes next to the
-cortical column. Also assigns the default file names for dumping when
-lfp is calculated. Includes the cell populations and the model size to
-be used for computing the lfp in the next steps. Also the dataset to
-be used is assigned here to variable 'h'
+    Has the option of selecting 1D, 2D or 3D electrodes next to the
+    cortical column. Also assigns the default file names for dumping when
+    lfp is calculated. Includes the cell populations and the model size to
+    be used for computing the lfp in the next steps. Also the dataset to
+    be used is assigned here to variable 'h'
 
-Here is a toggle for selection of 1D or 2D electrode selection for
-subsequent calculations.
+    Here is a toggle for selection of 1D or 2D electrode selection for
+    subsequent calculations.
 
-2. calc_lfp.py
+2.  calc_lfp.py
 
-Computes the extracellular potentials using the tranmembrane currents
-from the population of cortical cells. The electrode positions and the
-populations to be changed for this computation are taken from
-lfp_parameters.py file. Also included is a function to convert the LFP
-calculated here into a neo object list, which can be used in elephant.
+    Computes the extracellular potentials using the tranmembrane currents
+    from the population of cortical cells. The electrode positions and the
+    populations to be changed for this computation are taken from
+    lfp_parameters.py file. Also included is a function to convert the LFP
+    calculated here into a neo object list, which can be used in elephant.
 
-In this script uses the source approximation, ie, the compartments are
-treated as point sources placed at the mid point of the
-compartments. It also has the lowpassfilter function used to compute
-the LFP from extracellular potentails (filtered using 2nd order
-butterworth filter).
+    In this script uses the source approximation, ie, the compartments are
+    treated as point sources placed at the mid point of the
+    compartments. It also has the lowpassfilter function used to compute
+    the LFP from extracellular potentails (filtered using 2nd order
+    butterworth filter).
 
-3. create_plot.py
+3.  create_plot.py
 
-Shows the measured potentials in a plot, for 1D and 2D electrode
-positions. It also shows the mid points of the compartments used in
-the LFP computation. And also marks the electrode positions.
+    Shows the measured potentials in a plot, for 1D and 2D electrode
+    positions. It also shows the mid points of the compartments used in
+    the LFP computation. And also marks the electrode positions.
 
-It also shows interpolated potentials recorded using the 1D and 2D
-probes. The 1D plot displayed is potentials versus time (x-axis), like
-a laminar probe and for the 2D is like an MEA plane electrodes at time
-point of 110.5 ms - this can be changed according to the user here.
+    It also shows interpolated potentials recorded using the 1D and 2D
+    probes. The 1D plot displayed is potentials versus time (x-axis), like
+    a laminar probe and for the 2D is like an MEA plane electrodes at time
+    point of 110.5 ms - this can be changed according to the user here.
 
-4) python raster_spikes.py
+4.  raster_spikes.py
 
-Shows color wise split of the spiking activity of the network
-activity. The different colors represent different neuron types. Up
-arrow indicates excitatory neuron. Down represents inhibitory neurons.
+    Shows color wise split of the spiking activity of the network
+    activity. The different colors represent different neuron types. Up
+    arrow indicates excitatory neuron. Down represents inhibitory neurons.
 
 ================= figures =====================
 
-These scripts use the data provided and generate the figures in the
-manuscript.
+See folder figures
+
+These python scripts use the data provided and generate the figures in
+the manuscript.
 
 1. figure1.py 
 
-Places electrodes in 2D and on the left shows the left side, the
-positions of the mid-pts of the compartments in black, plus the
-electrode positions. Also included is the inset figure corresponding
-to the potentials recoded at the marked electrodes.
+   Places electrodes in 2D and on the left shows the left side, the
+   positions of the mid-pts of the compartments in black, plus the
+   electrode positions. Also included is the inset figure corresponding
+   to the potentials recoded at the marked electrodes.
 
-On the right the MEA intepolated potential from the said recorded
-electrodes, at the time point indicated in the inset figure
+   On the right the MEA intepolated potential from the said recorded
+   electrodes, at the time point indicated in the inset figure
 
 2. figure2_twocell_data.py and figure2_twocell_map.py
 
-Shows the internal structure of the NSDF file from these simulations.
+   Shows the internal structure of the NSDF file from these simulations.
 
 3. figure3.py
 
-Displays analysis of small network size, with individual currents)
-raster plot, and LFP contributions to extracellular potential filtered
-below 100 Hz which come from C)NMDA & AMPA (recorded together) D) GABA
-E) capacitive, F) potassium, G) passive, H) calcium, I) sodium J) two
-kinds of calcium low threshold T type currents not causing [Ca2+]
-influx K) anomalous rectifier, L) All other currents, such as ectopic
-currents and depolarizing currents.
+   Displays analysis of small network size, with individual currents)
+   raster plot, and LFP contributions to extracellular potential filtered
+   below 100 Hz which come from C)NMDA & AMPA (recorded together) D) GABA
+   E) capacitive, F) potassium, G) passive, H) calcium, I) sodium J) two
+   kinds of calcium low threshold T type currents not causing [Ca2+]
+   influx K) anomalous rectifier, L) All other currents, such as ectopic
+   currents and depolarizing currents.
 
 4. figure4.py
 
-Displays contributions towards the extracellular potentails from
-different types of current sources. Possible via the different
-datasets presented here.
+   Displays contributions towards the extracellular potentails from
+   different types of current sources. Possible via the different
+   datasets presented here.
 
 
 
