@@ -77,10 +77,10 @@ def plot_morp_ele(ax1, src_pos, ele_pos, pot, time_pt):
     ax = plt.subplot(121, aspect='equal')
     plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=0.7, color='k', s=0.6)
     plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='x', alpha=0.8, color='r', s=0.9)
-    # for tx in range(len(ele_pos[:,0])):
-        # plt.text(ele_pos[tx, 0], ele_pos[tx, 1], str(tx))
-    ele_1 = 154
-    ele_2 = 146
+    #for tx in range(len(ele_pos[:,0])):
+    #    plt.text(ele_pos[tx, 0], ele_pos[tx, 1], str(tx))
+    ele_1 = 152
+    ele_2 = 148
     plt.scatter(ele_pos[ele_1, 0], ele_pos[ele_1, 1], marker='s', color='r', s=14.)
     plt.scatter(ele_pos[ele_2, 0], ele_pos[ele_2, 1], marker='s', color='b', s=14.)
     plt.xlabel('X ($\mu$m)')
@@ -92,26 +92,27 @@ def plot_morp_ele(ax1, src_pos, ele_pos, pot, time_pt):
     cbaxes = inset_axes(ax,
                         width="50%",  # width = 10% of parent_bbox width
                         height="17%",  # height : 50%
-                        loc=4, borderpad=2.)
+                        loc=4, borderpad=2.2)
     
-    plt.plot(np.arange(6000), pot[ele_1, :], color='r')
-    plt.plot(np.arange(6000), pot[ele_2, :], color='b')
+
+    plt.plot(np.arange(6000), pot[ele_1, :], color='r', linewidth=0.5)
+    plt.plot(np.arange(6000), pot[ele_2, :], color='b', linewidth=0.5)
 
     dummy_line = np.arange(-0.5, 0.5, 0.1)
-    plt.plot(np.zeros_like(dummy_line)+time_pt, dummy_line, color='black', linewidth=2) 
+    plt.plot(np.zeros_like(dummy_line)+time_pt, dummy_line, color='black', linewidth=1) 
 
     # ax=plt.gca()
     # ax.arrow(time_pt, -0.1, 0., 0.075, head_width=0.05,
     #          head_length=0.05, width=0.1,
     #          length_includes_head=True, fc='k', ec='k')
-    plt.xlim((2750, 4250))
-    plt.xticks(np.arange(3000, 5000, 1000), np.arange(300, 500, 100))
-    plt.ylim((-0.2, 0.1))
+    plt.xlim((2750, 3500)) #4250))
+    #plt.xticks(np.arange(3000, 5000, 1000), np.arange(300, 500, 100))
+    plt.xticks(np.arange(2750, 3750, 250), np.arange(275, 375, 25))
+    plt.ylim((-0.2, 0.12))
     plt.yticks(np.arange(-0.2, 0.1, 0.1),np.arange(-0.2, 0.1, 0.1))
     ax = plt.gca()
     ax.get_yaxis().tick_right()#set_tick_params(direction='in')
-    # plt.xlabel('time (ms)')
-    # plt.ylabel('potential ($\mu V$)')
+
 
     # inset_plt = plt.plot(cax=cbaxes, 
     # cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
@@ -147,7 +148,7 @@ def plot_extracellular(ax4, lfp, ele_pos, num_x, num_y, time_pt):
     cbaxes = inset_axes(ax,
                         width="50%",  # width = 10% of parent_bbox width
                         height="2%",  # height : 50%
-                        loc=1, borderpad=1)
+                        loc=1, borderpad=1.5)
     cbar = plt.colorbar(cax=cbaxes, ticks=[-lfp_max,0.,lfp_max], orientation='horizontal', format='%.2f')
     cbar.ax.set_xticklabels([round(-lfp_max,2),str('0 $\mu V$'),round(lfp_max,2)])
     return ax4

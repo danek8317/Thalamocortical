@@ -1,7 +1,8 @@
-====================== README from NEURON version ======================
+======== README from NEURON version ====================== 
+
 README from Version of the code
 https://senselab.med.yale.edu/modeldb/showModel.cshtml?model=82894 For
-changes and modification to this code, see below
+changes and modification to this code, **SEE BELOW**
 
 NEURON version of Traub et al J Neurophysiol. 2005 Apr;93(4):1829-30.
 Single-column thalamocortical network model exhibiting gamma
@@ -115,9 +116,9 @@ with dt resolution) is presented.
 
 ========================== Modifications ==========================
 
-Modificiations to the Traub's model in Neuron to record transmembrane currents
-Also included is file to generate 3D morphology
-See Thalamocortical_imem folder
+Modificiations to the Traub's model in Neuron to record transmembrane
+currents Also included is file to generate 3D morphology See
+Thalamocortical_imem folder
 
 Traub model + additional module to record transmembrane currents 
 To generate 3d information run 
@@ -169,78 +170,69 @@ in mod folders additional files:
 
 Additional mylib library
 
-init.hoc 
-         - initilizes all needed objects like conteners to save
+* init.hoc 
+  * initilizes all needed objects like conteners to save
 voltage, transmembrane currents e.c.t.  
-
-         - close some or all of theions channels if passive_axon = 1,
+  * close some or all of theions channels if passive_axon = 1,
 passive_soma = 1, passive_dendrites = 1, passive passive_axon = 1 or
 set_zero_fast_na = 1
  
-lib.hoc - contains set of funcions used in other files
+* lib.hoc 
 
-params.hoc - set of prameters used to save data, to apply additional
-stimulus, to close some/all of ion chanels
+  * contains set of funcions used in other files
 
-modules:
-	saving_data
+params.hoc 
 
-		saving_data.hoc - contains definition of functions to
-			get, interpolate (with a constance time step
-			-> "t_step" parameter in params.hoc - since
-			simulation are with a variable time step) and
-			write the data
+  * set of prameters used to save data, to apply additional stimulus,
+to close some/all of ion chanels
+
+modules: 
+* saving_data 
+  * saving_data.hoc - contains definition of
+functions to get, interpolate (with a constance time step -> "t_step"
+parameter in params.hoc - since simulation are with a variable time
+step) and write the data
 			
-		additional_curr.dat - specification of single currents
-			   which you want to write, number of lines
-			   depends on "n_currents" and
-			   "n_not_ionic_curr" in a "params.hoc"
+* additional_curr.dat 
 
-			   1."n_not_ionic_curr" lines which contains
-			   name of not ionic current with sign
-			   {-1,0,1} which tells how the current
-			   confluence transmembrane current
+  * specification of single currents which you want to write, number
+of lines depends on "n_currents" and "n_not_ionic_curr" in a
+"params.hoc"
 
-			   2."n_currents" lines with conditions when
-			   the current should be truck, e.g you can't
-			   truck Ca current if there are no Ca chanels
-			   in the segment 
+   1."n_not_ionic_curr" lines which contains name of not ionic current
+with sign {-1,0,1} which tells how the current confluence
+transmembrane current
 
-                           3."n_currents" lines with definition of
-			   currents which you want to truck ss object
-			   is defined in saving_data.hoc contains
-			   not_ionic_sources defined at the top of the
-			   file
+   2."n_currents" lines with conditions when the current should be
+   truck, e.g you can't truck Ca current if there are no Ca chanels in
+   the segment
 
-	shape3d
-		cells_shape
-			..._shape.dat - single cell 3d morphology
+   3."n_currents" lines with definition of currents which you want to
+   truck ss objects is defined in saving_data.hoc contains
+   not_ionic_sources defined at the top of the file
 
-		generate3dinformation.hoc - code in hoc to generate
-		random 3d positions
+* shape3d 
 
-		extra_shape.hoc -
+  * cells_shape _shape.dat - single cell 3d morphology
 
-		shapes_mat.txt - mapping from the population to
-			 morphology type from cells_shape folder
-			 (e.g. n-th line refer to the n-th population
-			 population)
-		
+  * generate3dinformation.hoc - code in hoc to generate random 3d
+  positions
 
-	stimulus
+  * extra_shape.hoc -
 
-		stimulus.hoc - definition of procedures to set
-			constant or sinusoidal stimulus (also
-			stimulating the network by virtual electrode,
-			but not sure if that works) vcevent.hoc -
-			procedures to create stimulator which
-			stimultes network by artifical spikes, path to
-			the file with artifical spikes time is defined
-			in "spikes_dir" in params.hoc The stimulator
-			is creted if "use_vecstim = 1" is in
-			params.hoc set_stimulus.hoc - set stimulus
-			(constant or sinusoidal) - execute procedures
-			defined in stimulus
+  * shapes_mat.txt - mapping from the population to mmorphology type
+    from cells_shape folder (e.g. n-th line refer to the n-th
+    population population)
+
+* stimulus 
+  * stimulus.hoc - definition of procedures to set constant or
+sinusoidal stimulus (also stimulating the network by virtual
+electrode, but not sure if that works) vcevent.hoc - procedures to
+create stimulator which stimultes network by artifical spikes, path to
+the file with artifical spikes time is defined in "spikes_dir" in
+params.hoc The stimulator is creted if "use_vecstim = 1" is in
+params.hoc set_stimulus.hoc - set stimulus (constant or sinusoidal) -
+execute procedures defined in stimulus
 
 
 ========================= Running simulation =========================
@@ -252,14 +244,14 @@ modules:
 	nrnivmodl mod
 	( folder i686, x86_64 , powerpc or other will appear)
 
-3. run the simulation
+3. To run the simulation
 
-	mpirun -np n_cores i686/special -mpi init.hoc (depending on an
-	architecture there can be x86_64/special or powerpc/special
-	e.t.c)
+   >mpirun -np n_cores i686/special -mpi init.hoc 
+   (depending on an architecture there can be x86_64/special or powerpc/special e.t.c)
 
-   or  calculate 3d positions:
-	mpirun -np n_cores i686/special -mpi generate3dinformation.hoc
+   To calculate 3d positions:
+	
+   mpirun -np n_cores i686/special -mpi generate3dinformation.hoc
 
 ====================== TODO ======================
 
@@ -312,56 +304,83 @@ After this a sane valid NSDF file is born
 These scripts are specific for these simulations, although can be
 extended to generic NSDF files.
 
-1) python calc_lfp.py
 
-Computes the LFP using the tranmembrane currents from the entire
-population of cortical cells
+1. lfp_parameters.py
 
-2) python lfp_parameters.py
+Has the option of selecting 1D, 2D or 3D electrodes next to the
+cortical column. Also assigns the default file names for dumping when
+lfp is calculated. Includes the cell populations and the model size to
+be used for computing the lfp in the next steps. Also the dataset to
+be used is assigned here to variable 'h'
 
-Has the option of selecting 1D or 2D electrodes next to the cortical
-column
+Here is a toggle for selection of 1D or 2D electrode selection for
+subsequent calculations.
 
-3) python create_plot.py
+2. calc_lfp.py
 
-Shows the measured potentials in a plot
+Computes the extracellular potentials using the tranmembrane currents
+from the population of cortical cells. The electrode positions and the
+populations to be changed for this computation are taken from
+lfp_parameters.py file. Also included is a function to convert the LFP
+calculated here into a neo object list, which can be used in elephant.
+
+In this script uses the source approximation, ie, the compartments are
+treated as point sources placed at the mid point of the
+compartments. It also has the lowpassfilter function used to compute
+the LFP from extracellular potentails (filtered using 2nd order
+butterworth filter).
+
+3. create_plot.py
+
+Shows the measured potentials in a plot, for 1D and 2D electrode
+positions. It also shows the mid points of the compartments used in
+the LFP computation. And also marks the electrode positions.
+
+It also shows interpolated potentials recorded using the 1D and 2D
+probes. The 1D plot displayed is potentials versus time (x-axis), like
+a laminar probe and for the 2D is like an MEA plane electrodes at time
+point of 110.5 ms - this can be changed according to the user here.
 
 4) python raster_spikes.py
 
-Shows color wise split of the spiking activity of selected NSDF file.
+Shows color wise split of the spiking activity of the network
+activity. The different colors represent different neuron types. Up
+arrow indicates excitatory neuron. Down represents inhibitory neurons.
 
 ================= figures =====================
 
 These scripts use the data provided and generate the figures in the
-MS.
+manuscript.
 
-1) python figure1.py 
+1. figure1.py 
 
 Places electrodes in 2D and on the left shows the left side, the
 positions of the mid-pts of the compartments in black, plus the
-electrode positions. 
+electrode positions. Also included is the inset figure corresponding
+to the potentials recoded at the marked electrodes.
 
 On the right the MEA intepolated potential from the said recorded
-electrodes.
+electrodes, at the time point indicated in the inset figure
 
-2)figure2_twocell_data.py and figure2_twocell_map.py
+2. figure2_twocell_data.py and figure2_twocell_map.py
 
 Shows the internal structure of the NSDF file from these simulations.
 
-3) python figure3.py
+3. figure3.py
 
-Displays analysis of small network size, with individual currents A)
-raster plot, and LFP and LFP components (contributions to
-extracellular potential filtered below 100 Hz) which come from C)NMDA
-+ AMPA (recorded together) D) GABA E) capacitive, F) potassium, G)
-passive, H) calcium, I) sodium J) two kinds of calcium low threshold T
-type currents not causing [Ca2+] influx K) anomalous rectifier, L) All
-other currents, such as ectopic currents and depolarizing currents.
+Displays analysis of small network size, with individual currents)
+raster plot, and LFP contributions to extracellular potential filtered
+below 100 Hz which come from C)NMDA & AMPA (recorded together) D) GABA
+E) capacitive, F) potassium, G) passive, H) calcium, I) sodium J) two
+kinds of calcium low threshold T type currents not causing [Ca2+]
+influx K) anomalous rectifier, L) All other currents, such as ectopic
+currents and depolarizing currents.
 
-4) python figure4.py
+4. figure4.py
 
 Displays contributions towards the extracellular potentails from
-different types of current sources.
+different types of current sources. Possible via the different
+datasets presented here.
 
 
 

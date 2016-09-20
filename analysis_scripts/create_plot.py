@@ -5,8 +5,16 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 rcParams.update({'font.size': 8})
+
+def get_all_src_pos(h, pop_names, total_cmpts):
+    """Function to compute the positions for a list of populations"""
+    all_srcs = np.zeros((sum(total_cmpts), 3))
+    for jj, pop_name in enumerate(pop_names):
+        all_srcs[np.sum(total_cmpts[:jj]):np.sum(total_cmpts[:jj+1]),
+                 :] = fetch_mid_pts(h, pop_name)
+    return all_srcs
+
 def update_contour_plot(i, data,  ax, xi, yi, levels):
     ax.cla()
     im = ax.contourf(xi.reshape(num_x, num_y), 
@@ -30,8 +38,10 @@ def grid(x, y, z, resX=100, resY=100):
 lfp = np.load(pot_filename)
 fig = plt.figure()#figsize=(4,6))
 plt.subplot(121, aspect='equal')
-for pop_name in pop_names:
-    src_pos = fetch_mid_pts(h, pop_name)
+src_pos = get_all_src_pos(h, pop_names, total_cmpts)
+#for pop_name in pop_names:
+#    print pop_name
+#    src_pos = fetch_mid_pts(h, pop_name)
 plt.scatter(src_pos[:, 0], src_pos[:, 1], marker='.', alpha=1, color='k', lw = 1., s=0.5)
 plt.scatter(ele_pos[:, 0], ele_pos[:, 1], marker='o', alpha=1., color='r', lw = 1., s=0.4)
 plt.xlabel('X ($\mu$m)')
@@ -49,9 +59,10 @@ if ele_config == '1D':
 
     plt.yticks(range(num_ele), ele_pos[:, 1].astype(int)[::-1])
     plt.xticks(np.arange(2500, 4500, 500), np.arange(250, 450, 50))
+    #plt.xlim(xmin=2200, xmax=4700)
     plt.ylabel('Electrode depth ($\mu$m)')
     plt.xlabel('Time (ms)')
-    plt.title('Extracellular potentails')
+    plt.title('Extracellular potentails (mV)')
     #plt.xlim(xmin=2500, xmax=4500)
     plt.colorbar()
 
@@ -74,6 +85,6 @@ plt.tight_layout()
 #plt.subplots_adjust(wspace = 0.001)
 #plt.setp(ax2.xaxis.get_majorticklabels(), rotation=70 )
 #plt.setp(ax.xaxis.get_majorticklabels(), rotation=70 )
-plt.savefig('1D_1105_traub.png', dpi=600)
-#plt.show()
+#plt.savefig('1D_1105_traub.png', dpi=600)
+plt.show()
 h.close()
