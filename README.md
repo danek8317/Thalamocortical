@@ -29,7 +29,7 @@ identical results there is always some question as to whether
 simulation differences are due to substantive parameter translation
 errors or can be attributed to different numerical methods.  It must
 be realized that our experience has been that every test into a new
-runtime domain has exhibited discprepancies that were ultimately
+runtime domain has exhibited discrepancies that were ultimately
 resolved by fixing translation errors.
 
 And also that our comparison tests are only between NEURON and an
@@ -41,7 +41,7 @@ are straight forward transformations of bulk array assignment into
 equivalent elementwise assignment via do loops.  Did we get them all?
 Did we assign over ALL the elements in each array?  We did manually
 review all ifc to g77 editing changes but a few cases involved our
-judgement with regard to whether there was a bug in the original ifc
+judgment with regard to whether there was a bug in the original ifc
 fortran version.  The modified FORTRAN used for the NEURON comparisons
 is available from this model=45539 page. As is, the g77 FORTRAN model
 can only be run as 14 processes, one for each cell type and a full
@@ -68,14 +68,14 @@ and used that information to define the NEURON network
 connections. For 10 ms with a 1/10 size network we focused on
 quantitative similarity of the spike raster plots. The FORTRAN version
 has a spike resolution time of 0.1 ms and all synaptic conductance
-trajectories are step functions with that resolution (the underying dt
+trajectories are step functions with that resolution (the underlying dt
 is 50 times smaller, dt = 0.002). We prepared a special version of the
 NEURON executable to force spike threshold detection on 0.1 ms
 boundaries to allow convenient comparison of spike rasters. For the
 first 10 ms we judged whether spike discrepancies were due to
 FORTRAN-NEURON spikes straddling the 0.1 ms boundaries or whether the
 discrepancy was likely to be due to a topology or synaptic parameter
-error. The judgement was based on the details of the voltage
+error. The judgment was based on the details of the voltage
 trajectory at the spike detector compartment.  We believe that careful
 analysis of the first 10 ms of the 100 ms spike raster overlap plot
 for the FORTRAN (fat red marks) and NEURON (thin black marks) in
@@ -116,7 +116,7 @@ with dt resolution) is presented.
 
 ========================== Modifications ==========================
 
-Modificiations to the Traub's model in Neuron to record transmembrane
+Modifications to the Traub's model in Neuron to record transmembrane
 currents Also included is file to generate 3D morphology See
 Thalamocortical_imem folder
 
@@ -136,7 +136,7 @@ in init.hoc:
    instead                       
    default_var("spike_compress", 5)
 
-just before running the siumulation
+just before running the simulation
      if (save_currents){init_all_data()}
 
 in parlib.hoc
@@ -173,7 +173,7 @@ Additional mylib library
 * init.hoc 
   * initilizes all needed objects like conteners to save
 voltage, transmembrane currents e.c.t.  
-  * close some or all of theions channels if passive_axon = 1,
+  * close some or all of the ion channels if passive_axon = 1,
 passive_soma = 1, passive_dendrites = 1, passive passive_axon = 1 or
 set_zero_fast_na = 1
  
@@ -204,11 +204,11 @@ with sign {-1,0,1} which tells how the current confluence
 transmembrane current
 
    2."n_currents" lines with conditions when the current should be
-   truck, e.g you can't truck Ca current if there are no Ca chanels in
+   truck, e.g you can't truck Ca current if there are no Ca channels in
    the segment
 
    3."n_currents" lines with definition of currents which you want to
-   truck ss objects is defined in saving_data.hoc contains
+   track ss objects is defined in saving_data.hoc contains
    not_ionic_sources defined at the top of the file
 
 * shape3d 
@@ -220,7 +220,7 @@ transmembrane current
 
   * extra_shape.hoc -
 
-  * shapes_mat.txt - mapping from the population to mmorphology type
+  * shapes_mat.txt - mapping from the population to morphology type
     from cells_shape folder (e.g. n-th line refer to the n-th
     population population)
 
@@ -228,9 +228,9 @@ transmembrane current
   * stimulus.hoc - definition of procedures to set constant or
 sinusoidal stimulus (also stimulating the network by virtual
 electrode, but not sure if that works) vcevent.hoc - procedures to
-create stimulator which stimultes network by artifical spikes, path to
-the file with artifical spikes time is defined in "spikes_dir" in
-params.hoc The stimulator is creted if "use_vecstim = 1" is in
+create stimulator which stimulates network by artificial spikes, path to
+the file with artificial spike times is defined in "spikes_dir" in
+params.hoc The stimulator is created if "use_vecstim = 1" is in
 params.hoc set_stimulus.hoc - set stimulus (constant or sinusoidal) -
 execute procedures defined in stimulus
 
@@ -269,7 +269,7 @@ ascending order of time.  pushes the 5th column element into a file
 named by the second column element; better organized data and requires
 GNU parallel for this step.
 
-Creates folder, ./i/tmp for currents and ./v/tmp for potentails.
+Creates folder, ./i/tmp for currents and ./v/tmp for potentials.
 After this ./i/*.dat and ./v/*.dat can be deleted because they are
 redundant.
 
@@ -300,18 +300,18 @@ After this a sane valid NSDF file is born
 
 ================ Analysis scripts ================ 
 
-See folder analysis_scripts
+See folder 'analysis_scripts'
 
-These python scripts are specific for these simulations, although can
+These Python scripts are specific for these simulations, although they can
 be extended to generic NSDF files.
 
 
 1.  lfp_parameters.py
 
     Has the option of selecting 1D, 2D or 3D electrodes next to the
-    cortical column. Also assigns the default file names for dumping when
-    lfp is calculated. Includes the cell populations and the model size to
-    be used for computing the lfp in the next steps. Also the dataset to
+    cortical column. Assigns default file names for dumping when
+    LFP is calculated. Includes cell populations and the model size to
+    be used for computing the LFP in the next steps. Also, the dataset to
     be used is assigned here to variable 'h'
 
     Here is a toggle for selection of 1D or 2D electrode selection for
@@ -319,51 +319,49 @@ be extended to generic NSDF files.
 
 2.  calc_lfp.py
 
-    Computes the extracellular potentials using the tranmembrane currents
+    Computes the extracellular potentials using the transmembrane currents
     from the population of cortical cells. The electrode positions and the
     populations to be changed for this computation are taken from
     lfp_parameters.py file. Also included is a function to convert the LFP
-    calculated here into a neo object list, which can be used in elephant.
+    calculated here into a NEO object list, which can be used e.g. in elephant.
 
-    In this script uses the source approximation, ie, the compartments are
+    In this script we use the point source approximation, i.e., the compartments are
     treated as point sources placed at the mid point of the
-    compartments. It also has the lowpassfilter function used to compute
-    the LFP from extracellular potentails (filtered using 2nd order
-    butterworth filter).
+    compartments. It also has the low pass filter function used to compute
+    the LFP from extracellular potentials (filtered using 2nd order
+    Butterworth filter).
 
 3.  create_plot.py
 
-    Shows the measured potentials in a plot, for 1D and 2D electrode
+    Shows the measured potentials in a plot for 1D and 2D electrode
     positions. It also shows the mid points of the compartments used in
-    the LFP computation. And also marks the electrode positions.
-
-    It also shows interpolated potentials recorded using the 1D and 2D
-    probes. The 1D plot displayed is potentials versus time (x-axis), like
-    a laminar probe and for the 2D is like an MEA plane electrodes at time
-    point of 110.5 ms - this can be changed according to the user here.
+    the LFP computation, marks the electrode positions, 
+    and shows interpolated potentials recorded using the 1D and 2D
+    probes. The plot displayed for 1D case shows potentials versus time (x-axis), like
+    for a laminar probe, and for the 2D it is like a plane of electrodes as in MEA at time
+    point of 110.5 ms - this can be changed here by the user.
 
 4.  raster_spikes.py
 
-    Shows color wise split of the spiking activity of the network
-    activity. The different colors represent different neuron types. Up
-    arrow indicates excitatory neuron. Down represents inhibitory neurons.
+    Shows the spiking activity of the network color coded. 
+    The different colors represent different neuron types. Up
+    arrow indicates an excitatory neuron. Down represents an inhibitory neuron.
 
 ================= figures =====================
 
-See folder figures
+See folder 'figures'
 
-These python scripts use the data provided and generate the figures in
+These Python scripts use the data provided and generate the figures in
 the manuscript.
 
 1. figure1.py 
 
-   Places electrodes in 2D and on the left shows the left side, the
-   positions of the mid-pts of the compartments in black, plus the
-   electrode positions. Also included is the inset figure corresponding
-   to the potentials recoded at the marked electrodes.
+   Places electrodes in 2D and on the left shows the positions of the 
+   mid-points of the compartments in black plus the electrode positions. 
+   An inset shows the potentials recorded at the marked electrodes.
 
-   On the right the MEA intepolated potential from the said recorded
-   electrodes, at the time point indicated in the inset figure
+   On the right interpolated potential from the recorded electrodes 
+   is shown at the time point indicated in the inset figure
 
 2. figure2_twocell_data.py and figure2_twocell_map.py
 
@@ -371,18 +369,19 @@ the manuscript.
 
 3. figure3.py
 
-   Displays analysis of small network size, with individual currents)
-   raster plot, and LFP contributions to extracellular potential filtered
-   below 100 Hz which come from C)NMDA & AMPA (recorded together) D) GABA
+   Displays some results of analysis of a small network, including
+   A) raster plot, B) LFP, and contributions to LFP (which is extracellular 
+   potential filtered below 100 Hz) from individual currents, which come 
+   specifically from C) NMDA & AMPA (recorded together) D) GABA
    E) capacitive, F) potassium, G) passive, H) calcium, I) sodium J) two
    kinds of calcium low threshold T type currents not causing [Ca2+]
-   influx K) anomalous rectifier, L) All other currents, such as ectopic
+   influx K) anomalous rectifier, L) all other currents, such as ectopic
    currents and depolarizing currents.
 
 4. figure4.py
 
-   Displays contributions towards the extracellular potentails from
-   different types of current sources. Possible via the different
+   Displays contributions to the extracellular potential from
+   different types of current sources. Possible thanks to the different
    datasets presented here.
 
 
