@@ -100,30 +100,46 @@ def pot_vs_time(h, pop_name, field_name, src_pos, ele_pos):
     return np.dot(ele_src, src_time) * (1 / (4 * np.pi * 0.3))
 
 def make_plot(src_pos, ele_pos, save_filename):
-    #fig = plt.figure()
+    ''' Makes a figure showing the relative pos of srcs and eles'''
+    #ax1 = plt.subplot(131, aspect='equal')
     ax1 = plt.subplot(121, aspect='equal')
     ax1.scatter(src_pos[:, 0], src_pos[:, 1],
                 marker='.', alpha=0.7, color='k', s=0.6)
     ax1.scatter(ele_pos[:, 0], ele_pos[:, 1],
                 marker='o', color='r', s=0.6)
-    ax1.set_xlabel('X ($\mu m)$')
-    ax1.set_ylabel('Y ($\mu m)$')
+    ax1.set_xlabel('X $(\mu m)$')
+    ax1.set_ylabel('Y $(\mu m)$')
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(False)
+    #ax2 = plt.subplot(132, aspect='equal')
     ax2 = plt.subplot(122, aspect='equal')
     ax2.scatter(src_pos[:, 1], src_pos[:, 2],
                 marker='.', alpha=0.7, color='k', s=0.6)
     ax2.scatter(ele_pos[:, 1], ele_pos[:, 2],
                 marker='o', color='r', s=0.6)
-    ax2.set_xlabel('Y ($\mu m)$')
-    ax2.set_ylabel('Z ($\mu m)$')
+    ax2.set_xlabel('Y $(\mu m)$')
+    ax2.set_ylabel('Z $(\mu m)$')
     ax2.spines['top'].set_visible(False)
     ax2.spines['right'].set_visible(False) 
-    plt.suptitle('Traubs TC model and electrodes')
+
+    # ax3 = plt.subplot(133)
+    # data = np.load(save_filename+'.npy')
+    # ax3.plot(data[20], c='b')
+    # ax3.plot(data[100], c='g')
+    # ax3.set_ylabel('Extracellular pot. ($\mu V$)')
+    # ax3.set_xlabel('Time (0.1*ms)')
+    # ax2.scatter(ele_pos[20, 1], ele_pos[20, 2],
+    #             marker='s', color='b', s=20)
+    # ax2.scatter(ele_pos[100, 1], ele_pos[100, 2],
+    #             marker='s', color='g', s=20)
+    # ax3.spines['top'].set_visible(False)
+    # ax3.spines['right'].set_visible(False)
+
+    plt.suptitle('Traubs TC model and Neuropixel electrodes')
     plt.savefig(save_filename+'.png', dpi=200)
     plt.show()
     
-def save_potentails(file_loc, save_filename, show=False):
+def save_potentials(file_loc, save_filename, show=False):
     ''' Either show electrodes or compute potentials'''
     ele_pos = fetch_electrodes(x_offset=150)
     num_ele = ele_pos.shape[0]
@@ -146,5 +162,5 @@ def save_potentails(file_loc, save_filename, show=False):
 file_loc = '/home/chaitanya/Downloads/pulsestimulus.h5'
 save_filename = 'neuropixels_128'
 
-# save_potentails(file_loc, save_filename, show=True)
-save_potentails(file_loc, save_filename, show=False)
+# save_potentials(file_loc, save_filename, show=True)
+save_potentials(file_loc, save_filename, show=False)
