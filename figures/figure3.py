@@ -5,7 +5,7 @@ import h5py as h5
 import brewer2mpl
 from matplotlib import rcParams, cm, gridspec
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid.inset_locator import inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 rcParams.update({'font.size': 8, 'font.family': 'sans-serif'})
 
@@ -50,7 +50,7 @@ def pot_vs_time(h, pop_name, field_names, src_pos, ele_pos):
     src_time = np.zeros((src_pos.shape[0], 6000))
     for field_name in field_names:
         idx = find_map_idx(h, pop_name, field_name)
-        this_field = h['/data/uniform/' + pop_name + '/' + field_name].value
+        this_field = h[('/data/uniform/' + pop_name + '/' + field_name)]
         src_time += this_field[idx]  # Order according to correct indices
     return np.dot(ele_src, src_time) * (1 / (4 * np.pi * 0.3))
 
@@ -68,7 +68,7 @@ def get_extracellular(h, pop_names, time_pts, ele_pos, variables):
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
         pot_sum += pot_vs_time(h, pop_name, variables, src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name, using currents', pop_name, variables
+        print('Done extracellular pots for pop_name, using currents', pop_name, variables)
     return pot_sum
 
 
@@ -150,13 +150,13 @@ def plot_raster(h, ax, title):
     inh_cells = ['bask23', 'axax23', 'LTS23',
                  'bask56', 'axax56', 'LTS56', 'nRT']
     cells = np.array(cell_range) / 10  # 10% MODEL
-    cells_spike = np.diff(cells)
+    cells_spike = np.diff(cells).astype(int)
     intra_cell_gap = 6
     intra_pop_gap = 15
     count = 0
     for ii, pop_name in enumerate(pop_names):
         cell_count = cells_spike[ii]
-        all_spikes = h['/data/event/' + pop_name + '/spikes'].value
+        all_spikes = h[('/data/event/' + pop_name + '/spikes')]
         int_spikes = all_spikes[0:cell_count]
         color = set2[ii]
         if pop_name in inh_cells:
@@ -167,8 +167,8 @@ def plot_raster(h, ax, title):
             x = int_spikes[kk]
             y = np.zeros_like(x) + count
             # ax.plot(x, y, '.', color=color)
-            ax.scatter(x, y, s=7, alpha=0.8, facecolor=color,
-                       marker=marker, linewidth='0.2', edgecolor='gray')  # edgecolor='none'
+            ax.scatter(x, y, s=7, alpha=0.8, facecolor=color, marker=marker,
+                       linewidth=0.2, edgecolor='gray')  # edgecolor='none'
             count -= intra_cell_gap
         count -= intra_pop_gap
     mid_pts = cells_spike / 2
@@ -228,6 +228,19 @@ def add_second_yaxis(ax):
     return
 
 
+def test_plot_raster(h, pop_names, ele_pos, time_pts, fig, variable_dict):
+    # z_steps = 4  # 4 for the plots
+    # height_ratios = [1 for i in range(z_steps)]
+    # height_ratios.append(0.07) #height of colorbar
+    # gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios)
+    # Spikes
+    ax = plt.subplot(1, 1, 1)
+    # spike__ax =
+    ax = plot_raster(h, ax, 'Spikes')
+    set_axis(ax, letter='A')
+    return fig
+
+
 def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     z_steps = 4  # 4 for the plots
     height_ratios = [1 for i in range(z_steps)]
@@ -235,9 +248,10 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios)
     # Spikes
     ax = plt.subplot(gs[0, 0])
-    spike_ax = plot_raster(h, ax, 'Spikes')
+    # spike_ax =
+    plot_raster(h, ax, 'Spikes')
     set_axis(ax, letter='A')
-    # LFP
+    # LFP2
     ax = plt.subplot(gs[0, 1])
     key_val = 'LFP'
     ax, im = get_specific(
@@ -316,6 +330,7 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     ax.set_xlabel('Time (ms)')
     return fig
 
+
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
 cell_range = [
     0,
@@ -336,7 +351,8 @@ total_cmpts = list(num_cmpts * num_cells)
 pop_names = ['pyrRS23', 'pyrFRB23', 'bask23', 'axax23', 'LTS23',
              'spinstel4', 'tuftIB5', 'tuftRS5', 'nontuftRS6',
              'bask56', 'axax56', 'LTS56']
-h = h5.File('../data/dataset24.h5', 'r')
+# h = h5.File('../data/dataset24.h5', 'r')
+h = h5.File('../data/pulsestimulus10model.h5', 'r')
 
 # IGNORED MAX_VAL_DICT
 # max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05,
@@ -380,7 +396,9 @@ time_pts = 6000
 # ax1 = plot_raster(h, ax, 'Spikes')
 
 fig = plt.figure(figsize=(12, 18))
+
 fig = consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict)
+# fig = test_plot_raster(h, pop_names, ele_pos, time_pts, fig, variable_dict)
 plt.tight_layout()
 plt.savefig('fig3.png', dpi=600)
-# plt.show()
+plt.show()

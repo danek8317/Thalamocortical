@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
 import sys
 sys.path.append('/home/cchintaluri/Thalamocortical/figures/kCSD-python')
-from KCSD1D import KCSD1D
+from kcsd import KCSD1D
 
 
 rcParams.update({'font.size': 8, 'font.family': 'sans-serif'})
@@ -17,15 +17,16 @@ def fetch_mid_pts(h, pop_name):
     x = (all_pts['x0']+all_pts['x1']) / 2.
     y = (all_pts['y0']+all_pts['y1']) / 2.
     z = (all_pts['z0']+all_pts['z1']) / 2.
-    x = x.reshape(x.size,1)
-    y = y.reshape(y.size,1)
-    z = z.reshape(z.size,1)
+    x = x.reshape(x.size, 1)
+    y = y.reshape(y.size, 1)
+    z = z.reshape(z.size, 1)
     return np.hstack((x, y, z))
+
 
 def find_map_idx(h, pop_name, field_name):
     '''Find the corresponding, locations of morphology in field'''
     mor = h['/data/static/morphology/'+pop_name]
-    print pop_name, field_name
+    print(pop_name, field_name)
     i_data = h['/data/uniform/'+pop_name+'/'+field_name]
     mor_names = mor.dims[0].values()[0] #entry in /map
     i_names = i_data.dims[0].values()[0] #entry in /map
@@ -49,7 +50,7 @@ def pot_vs_time(h, pop_name, field_names, src_pos, ele_pos):
     src_time = np.zeros((src_pos.shape[0], 6000))
     for field_name in field_names:
         idx = find_map_idx(h, pop_name, field_name)
-        this_field = h['/data/uniform/'+pop_name+'/'+field_name].value
+        this_field = h[('/data/uniform/'+pop_name+'/'+field_name)]
         src_time += this_field[idx] # Order according to correct indices
     return np.dot(ele_src, src_time)*(1 / (4*np.pi*0.3))
 
@@ -64,7 +65,7 @@ def get_extracellular(h, pop_names, time_pts, ele_pos, variables):
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
         pot_sum += pot_vs_time(h, pop_name, variables, src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name, using currents', pop_name, variables
+        print('Done extracellular pots for pop_name, using currents', pop_name, variables)
     return pot_sum
 
 def place_electrodes_1D(n):
@@ -117,13 +118,13 @@ def plot_raster(h, ax, title):
     inh_cells = ['bask23','axax23','LTS23', 
                  'bask56', 'axax56', 'LTS56', 'nRT']
     cells = np.array(cell_range)/ 10 #10% MODEL
-    cells_spike = np.diff(cells)
+    cells_spike = np.diff(cells).astype(int)
     intra_cell_gap = 6
     intra_pop_gap = 15
     count = 0
-    for ii,pop_name in enumerate(pop_names):
+    for ii, pop_name in enumerate(pop_names):
         cell_count = cells_spike[ii]
-        all_spikes = h['/data/event/'+pop_name+'/spikes'].value
+        all_spikes = h[('/data/event/'+pop_name+'/spikes')]
         int_spikes = all_spikes[0:cell_count]
         color = set2[ii]
         if pop_name in inh_cells:
@@ -135,7 +136,7 @@ def plot_raster(h, ax, title):
             y = np.zeros_like(x) + count
             #ax.plot(x, y, '.', color=color)
             ax.scatter(x, y, s=7, alpha=0.8,facecolor=color, 
-                       marker=marker, linewidth='0.2', edgecolor='gray') #edgecolor='none'
+                       marker=marker, linewidth=0.2, edgecolor='gray') #edgecolor='none'
             count -= intra_cell_gap
         count -= intra_pop_gap
     mid_pts = cells_spike / 2
@@ -224,7 +225,7 @@ def inv_distance(src_pos, ele_pos):
 def pot_vs_time_2D(h, pop_name, field_name, src_pos, ele_pos):
     """returns potentials, at ele_pos, due to src_pos, over time"""
     idx = find_map_idx(h, pop_name, field_name)
-    src_time = h['/data/uniform/'+pop_name+'/'+field_name].value
+    src_time = h[('/data/uniform/'+pop_name+'/'+field_name)]
     src_time = src_time[idx] # Order according to correct indices
     ele_src = inv_distance(src_pos, ele_pos).T
     return np.dot(ele_src, src_time)*(1 / (4*np.pi*0.3))
@@ -233,7 +234,7 @@ def get_all_src_pos(h, pop_names, total_cmpts):
     """Function to compute the positions for a list of populations"""
     all_srcs = np.zeros((sum(total_cmpts), 3))
     for jj, pop_name in enumerate(pop_names):
-        all_srcs[np.sum(total_cmpts[:jj]):np.sum(total_cmpts[:jj+1]), :] = fetch_mid_pts(h, pop_name)
+        all_srcs[np.sum(total_cmpts[:jj]).astype(int):np.sum(total_cmpts[:jj+1]), :] = fetch_mid_pts(h, pop_name)
     return all_srcs
 
 def get_extracellular_2D(h, pop_names, time_pts, ele_pos):
@@ -243,7 +244,7 @@ def get_extracellular_2D(h, pop_names, time_pts, ele_pos):
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
         pot_sum += pot_vs_time_2D(h, pop_name, 'i', src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name', pop_name
+        print('Done extracellular pots for pop_name', pop_name)
     return pot_sum
 
 def plot_morp_ele(ax, src_pos, ele_pos, pot, time_pt):
@@ -410,12 +411,13 @@ def consolidated_figure(h, pop_names, ele_pos, time_pts, fig, variable_dict):
     
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
 cell_range = [0,1000,1050,1140,1230,1320,1560,2360,2560,3060,3160,3260,3360]
-num_cells = np.diff(cell_range) / 10 #10% MODEL
+num_cells = (np.diff(cell_range) / 10).astype(int)  # 10% MODEL
 total_cmpts = list(num_cmpts*num_cells)
 pop_names = ['pyrRS23','pyrFRB23','bask23','axax23','LTS23', 
              'spinstel4', 'tuftIB5', 'tuftRS5', 'nontuftRS6', 
              'bask56', 'axax56', 'LTS56']
-h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/traub_syn.h5', 'r')
+# h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/small_awake05/1/traub_syn.h5', 'r')
+h = h5.File('../data/pulsestimulus10model.h5', 'r')
 
 # #IGNORED MAX_VAL_DICT
 # max_val_dict = {'i':0.05, 'i_gaba_a': 0.05, 'i_cap':0.05, 

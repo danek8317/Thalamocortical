@@ -2,7 +2,7 @@ import scipy.spatial
 from scipy import signal
 import numpy as np
 import h5py as h5
-import brewer2mpl
+# import brewer2mpl
 from matplotlib import rcParams, cm, gridspec
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
@@ -66,7 +66,7 @@ def get_extracellular(h, pop_names, time_pts, ele_pos, variable):
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
         pot_sum += pot_vs_time(h, pop_name, variable, src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name, using currents', pop_name, variable
+        print('Done extracellular pots for pop_name, using currents', pop_name, variable)
     return pot_sum
 
 
@@ -217,6 +217,7 @@ def consolidated_figure(h_dict, pop_names, ele_pos, time_pts, fig):
     # cbar3 = plt.colorbar(im, cax=cax3, orientation='horizontal',
     # extend='both')
     return fig
+
 
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
 cell_range = [

@@ -4,7 +4,7 @@ import h5py as h5
 from matplotlib import rcParams, cm, ticker, gridspec
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid.inset_locator import inset_axes
-#from KCSD2D import KCSD2D
+# from KCSD2D import KCSD2D
 
 rcParams.update({'font.size': 8, 'font.family': 'sans-serif'})
 
@@ -67,7 +67,7 @@ def get_all_src_pos(h, pop_names, total_cmpts):
     """Function to compute the positions for a list of populations"""
     all_srcs = np.zeros((sum(total_cmpts), 3))
     for jj, pop_name in enumerate(pop_names):
-        all_srcs[np.sum(total_cmpts[:jj]):np.sum(
+        all_srcs[(np.sum(total_cmpts[:jj])).astype(int):np.sum(
             total_cmpts[:jj + 1]), :] = fetch_mid_pts(h, pop_name)
     return all_srcs
 
@@ -79,7 +79,7 @@ def get_extracellular(h, pop_names, time_pts, ele_pos):
     for pop_name in pop_names:
         src_pos = fetch_mid_pts(h, pop_name)
         pot_sum += pot_vs_time(h, pop_name, 'i', src_pos, ele_pos)
-        print 'Done extracellular pots for pop_name', pop_name
+        print('Done extracellular pots for pop_name', pop_name)
     return pot_sum
 
 
@@ -175,12 +175,13 @@ time_pt_interest = 3010
 num_cmpts = [74, 74, 59, 59, 59, 59, 61, 61, 50, 59, 59, 59]
 cell_range = [0, 1000, 1050, 1140, 1230, 1320,
               1560, 2360, 2560, 3060, 3160, 3260, 3360]
-num_cells = np.diff(cell_range) / 10  # 10% MODEL
+num_cells = (np.diff(cell_range) / 10).astype(int)  # 10% MODEL
 total_cmpts = list(num_cmpts * num_cells)
 pop_names = ['pyrRS23', 'pyrFRB23', 'bask23', 'axax23', 'LTS23',
              'spinstel4', 'tuftIB5', 'tuftRS5', 'nontuftRS6',
              'bask56', 'axax56', 'LTS56']
-h = h5.File('../data/dataset24.h5', 'r')
+# h = h5.File('../data/dataset24.h5', 'r')
+h = h5.File('../data/pulsestimulus10model.h5', 'r')
 # h = h5.File('/media/cchintaluri/PersonalBackup/data/hela_data/512/12_5/all/traub.h5', 'r')
 num_x, num_y = 16, 20
 num_ele = num_x * num_y
@@ -199,5 +200,5 @@ ax4 = plot_extracellular(ax4, pot, ele_pos, num_x, num_y, time_pt_interest)
 
 # fig, ax3 = plot_csd(fig, ele_pos, pot, time_pt_interest)
 plt.tight_layout()
-# plt.savefig('fig1.png', dpi=600)
+plt.savefig('fig1.png', dpi=600)
 plt.show()
